@@ -6,12 +6,15 @@ export default createMuiTheme({
   shadows: Array(25).fill('none') as Shadows,
   typography: {
     h1: {
-      fontSize: '2.5rem',
+      fontSize: '1.5rem',
+      '@media (min-width:600px)': {
+        fontSize: '2.5rem',
+      },
     }
   },
   palette: {
     background: {
-      default: '#f5fafd',
+      default: '#efeeea',
     }
   },
 });

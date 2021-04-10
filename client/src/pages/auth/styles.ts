@@ -7,7 +7,10 @@ export const authStyles = makeStyles((theme) => ({
   paper: {
     padding: theme.spacing(4),
   },
-  input: {
+  form: {
     margin: theme.spacing(4, 0),
+  },
+  input: {
+    marginBottom: theme.spacing(2),
   }
 }));
