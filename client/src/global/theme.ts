@@ -10,11 +10,11 @@ export default createMuiTheme({
       '@media (min-width:600px)': {
         fontSize: '2.5rem',
       },
-    }
+    },
   },
   palette: {
     background: {
       default: '#efeeea',
-    }
+    },
   },
 });

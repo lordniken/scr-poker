@@ -38,6 +38,7 @@
           "allowForLoopAfterthoughts": true
         }
       ],
+      "comma-dangle": ["error", "always-multiline"],
       "no-param-reassign": 0,      
       "react/jsx-key": "error",
       "import/no-extraneous-dependencies": [
