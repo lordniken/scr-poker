@@ -11,7 +11,7 @@ const FlexBox: React.FC<IProps> = (
     display = 'flex',
     children, 
     ...rest
-  }
+  },
 ) => (
   <Box 
     display={display}

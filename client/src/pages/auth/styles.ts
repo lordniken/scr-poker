@@ -12,5 +12,5 @@ export const authStyles = makeStyles((theme) => ({
   },
   input: {
     marginBottom: theme.spacing(2),
-  }
+  },
 }));
