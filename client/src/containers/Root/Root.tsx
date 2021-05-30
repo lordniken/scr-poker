@@ -1,18 +1,16 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { useGlobalStyles } from 'hooks';
-import { AuthPage } from 'pages';
+import { renderRoutes, routes } from 'global/router';
+
+const renderedRoutes = renderRoutes(routes);
 
 const Root: React.FC = () => {
   useGlobalStyles();
   
   return (
     <BrowserRouter>
-      <Switch>
-        <Route>
-          <AuthPage />
-        </Route>
-      </Switch>
+      {renderedRoutes}
     </BrowserRouter>
   );
 };
