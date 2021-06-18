@@ -11,6 +11,7 @@ module.exports = merge(commonConfig, {
     hot: true, 
     port: 3000,
     historyApiFallback: true,
+    proxy: { "/gql": { target: 'http://localhost:5000', secure: false }  },
   },
   devtool: "cheap-module-source-map",
   plugins: [
