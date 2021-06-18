@@ -26,7 +26,7 @@ Promise.all(
 
   colors.enable();
 
-  const app = await NestFactory.create(Application);
+  const app = await NestFactory.create(Application, { cors: true });
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(port);
