@@ -1,5 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { useQuery, gql } from '@apollo/client';
 import { Container, Paper, Typography, Link, Button, Box } from '@material-ui/core';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FlexBox, TextField } from 'components';
@@ -23,6 +24,16 @@ const Auth: React.FC = () => {
   React.useEffect(() => {
     inputRef?.current?.focus();
   }, []);
+
+  const x = useQuery(gql`
+    query{
+      me{
+        username
+      }
+    }
+  `);
+
+  console.log(x);
 
   return (
     <Container maxWidth="sm" className={styles.root}>

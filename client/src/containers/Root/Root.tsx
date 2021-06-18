@@ -1,17 +1,28 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+} from '@apollo/client';
 import { useGlobalStyles } from 'hooks';
 import { renderRoutes, routes } from 'global/router';
 
 const renderedRoutes = renderRoutes(routes);
+const client = new ApolloClient({
+  uri: 'http://localhost:5000',
+  cache: new InMemoryCache(),
+});
 
 const Root: React.FC = () => {
   useGlobalStyles();
-  
+
   return (
-    <BrowserRouter>
-      {renderedRoutes}
-    </BrowserRouter>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        {renderedRoutes}
+      </BrowserRouter>
+    </ApolloProvider>
   );
 };
 
