@@ -1,23 +1,22 @@
 import React from 'react';
-import { Divider, List, ListItem, ListItemText } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { List, ListItem, ListItemText } from '@material-ui/core';
+import { Link, useLocation } from 'react-router-dom';
+import { routes } from 'global/router';
 import { sidebarStyles } from './styles';
 
 const Sidebar: React.FC = () => {
   const styles = sidebarStyles();
+  const { pathname } = useLocation();  
 
   return (
     <List component="nav" className={styles.root}>
-      <ListItem button component={Link} to="/dashboard/new-game">
-        <ListItemText primary="New game" />
-      </ListItem>
-      <ListItem button disabled>
-        <ListItemText primary="Game history" />
-      </ListItem>
-      <Divider />
-      <ListItem button disabled>
-        <ListItemText primary="Manage team" />
-      </ListItem>      
+      {
+        routes.map(({ title, path }) => title && (
+          <ListItem key={path} button component={Link} to={path} selected={pathname === path}>
+            <ListItemText primary={title} />
+          </ListItem>
+        ))
+      }
     </List>
   );
 };

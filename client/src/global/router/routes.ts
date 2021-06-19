@@ -10,12 +10,14 @@ const routes: TRoute[] = [
   },
   {
     path: '/dashboard',
+    title: 'Dashboard',
     exact: true,
     component: Dashboard,
     private: true,
   },   
   {
-    path: '/dashboard/new-game',
+    path: '/new-game',
+    title: 'New game',
     exact: true,
     component: NewGame,
     private: true,
