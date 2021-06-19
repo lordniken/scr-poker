@@ -1,14 +1,15 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuery, gql } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { Container, Paper, Typography, Link, Button, Box } from '@material-ui/core';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FlexBox, TextField } from 'components';
 import { authStyles } from './styles';
 import { authValidationSchema } from './validation';
+import BasicCreateUserMutation from './BasicAuthMutation.graphql';
 
 const INITIAL_VALUES = {
-  name: '',
+  username: '',
 };
 
 const Auth: React.FC = () => {
@@ -18,22 +19,14 @@ const Auth: React.FC = () => {
     defaultValues: INITIAL_VALUES,
     resolver: yupResolver(authValidationSchema),
   });
+  const [createUser] = useMutation(BasicCreateUserMutation);
+  const onSubmit = React.useCallback(({ username }: typeof INITIAL_VALUES) => 
+    createUser({ variables: { username } }), [createUser]);
   const inputRef = React.useRef<HTMLInputElement>(null);
-  const onSubmit = (data: typeof INITIAL_VALUES) => alert(JSON.stringify(data));
 
   React.useEffect(() => {
     inputRef?.current?.focus();
   }, []);
-
-  const x = useQuery(gql`
-    query{
-      me{
-        username
-      }
-    }
-  `);
-
-  console.log(x);
 
   return (
     <Container maxWidth="sm" className={styles.root}>
@@ -43,7 +36,7 @@ const Auth: React.FC = () => {
             <Typography variant="h1" align="center">Introduce yourself!</Typography>
             <Box alignItems="center" flexDirection="column" className={styles.form}>
               <TextField
-                name="name"
+                name="username"
                 label="Your name"
                 variant="outlined"
                 fullWidth
