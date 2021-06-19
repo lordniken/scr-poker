@@ -1,4 +1,3 @@
-import { TRoute } from 'types';
 import { Auth, Dashboard } from 'pages';
 
 const routes: TRoute[] = [

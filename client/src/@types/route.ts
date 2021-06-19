@@ -1,4 +1,4 @@
-export type TRoute = {
+declare type TRoute = {
   path: string;
   exact?: boolean;
   private?: boolean;
