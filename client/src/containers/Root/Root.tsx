@@ -10,7 +10,7 @@ import { renderRoutes, routes } from 'global/router';
 
 const renderedRoutes = renderRoutes(routes);
 const client = new ApolloClient({
-  uri: 'http://localhost:3000/gql',
+  uri: 'http://localhost:5000/graphql',
   cache: new InMemoryCache(),
 });
 

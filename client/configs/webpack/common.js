@@ -35,6 +35,11 @@ module.exports = {
           "image-webpack-loader?bypassOnDebug&optipng.optimizationLevel=7&gifsicle.interlaced=false",
         ],
       },
+      {
+        test: /\.graphql?$/, 
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader',
+      }
     ],
   },
   plugins: [
