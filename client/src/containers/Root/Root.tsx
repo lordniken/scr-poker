@@ -19,8 +19,6 @@ const httpLink = createHttpLink({
 const authLink = setContext((_, { headers }) => {
   const token = getValue('scr-poker-token');
 
-  console.log('HAEEDER', token);
-
   return {
     headers: {
       ...headers,

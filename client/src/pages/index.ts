@@ -1,3 +1,4 @@
 export { default as Main } from './main';
 export { default as Auth } from './auth';
-export { default as Dashboard } from './dashboard';
+export { Dashboard, DashboardStruct } from './dashboard';
+export { default as NewGame } from './newGame';
