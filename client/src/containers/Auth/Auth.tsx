@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import CheckAuthQuery from './CheckAuthQuery.graphql';
+import MeQuery from './MeQuery.graphql';
 
 interface IAuthContext {
   isAuth: boolean;
@@ -11,7 +11,7 @@ export const AuthContext = React.createContext<IAuthContext>({
 });
 
 export const AuthProvider: React.FC = ({ children }) => {
-  const { data, loading } = useQuery(CheckAuthQuery, {
+  const { data, loading } = useQuery(MeQuery, {
     notifyOnNetworkStatusChange: true,
   });
   const [isAuth, setAuth] = React.useState(false);

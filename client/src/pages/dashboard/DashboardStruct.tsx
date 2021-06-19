@@ -6,8 +6,10 @@ import Sidebar from './Sidebar';
 const DashboardStruct: React.FC = ({ children }) => (
   <>
     <Header />
-    <FlexBox>
-      <Sidebar />
+    <FlexBox marginTop={10}>
+      {
+        //<Sidebar />
+      }
       {children}
     </FlexBox>
   </>

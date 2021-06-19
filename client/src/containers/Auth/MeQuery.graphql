@@ -1,4 +1,4 @@
-query CheckAuthQuery{
+query MeQuery{
   me{
     username
   }
