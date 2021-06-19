@@ -1,0 +1,5 @@
+query CheckAuthQuery{
+  me{
+    username
+  }
+}

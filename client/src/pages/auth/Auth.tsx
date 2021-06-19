@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { Container, Paper, Typography, Link, Button, Box } from '@material-ui/core';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { FlexBox, TextField } from 'components';
+import { setValue } from 'utils';
 import { authStyles } from './styles';
 import { authValidationSchema } from './validation';
 import BasicCreateUserMutation from './BasicAuthMutation.graphql';
@@ -19,7 +20,12 @@ const Auth: React.FC = () => {
     defaultValues: INITIAL_VALUES,
     resolver: yupResolver(authValidationSchema),
   });
-  const [createUser] = useMutation(BasicCreateUserMutation);
+  const [createUser] = useMutation(BasicCreateUserMutation, {
+    onCompleted: ({ createUser: userToken }) => {
+      setValue('scr-poker-token', userToken);
+      window.location.href = '/dashboard';
+    },
+  });
   const onSubmit = React.useCallback(({ username }: typeof INITIAL_VALUES) => 
     createUser({ variables: { username } }), [createUser]);
   const inputRef = React.useRef<HTMLInputElement>(null);

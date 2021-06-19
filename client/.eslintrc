@@ -103,6 +103,15 @@
       "react/no-children-prop": "off",
       "react/no-find-dom-node": "off",
       "no-unused-expressions": "off",
-      "react/prefer-stateless-function": "off"
+      "react/prefer-stateless-function": "off",
+      "import/no-anonymous-default-export": ["error", {
+        "allowArray": true,
+        "allowArrowFunction": true,
+        "allowAnonymousClass": false,
+        "allowAnonymousFunction": true,
+        "allowCallExpression": true,
+        "allowLiteral": false,
+        "allowObject": false
+      }]
     }
   }
