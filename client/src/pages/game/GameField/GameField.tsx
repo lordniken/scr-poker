@@ -1,10 +1,14 @@
 import React from 'react';
 
-const GameField: React.FC = () => {
-  console.log('gf');
+interface IProps {
+  title: string;
+}
+
+const GameField: React.FC<IProps> = ({ title }) => {
+  console.log('game field');
 
   return (
-    <p>Game field</p>
+    <p>{title}</p>
   );
 };
 

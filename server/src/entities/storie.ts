@@ -8,4 +8,12 @@ export class StorieEntity extends Base {
 
   @Column({ type: 'varchar', length: 200 })
   storieName: string;
+
+  @Column('boolean', { default: false })
+  isVoted: boolean;
+
+  /*
+  @Column("int", { array: true })
+  votes: number[];
+  */
 }

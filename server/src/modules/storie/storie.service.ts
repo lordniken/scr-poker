@@ -25,4 +25,19 @@ export class StorieService {
 
     return stories;
   }
+
+  async findOneById(id: string): Promise<Storie> {
+    return await this.storieRepository.findOne({ id });
+  }
+
+  async startStorieVote(id: string): Promise<void> {
+    /*
+    const storie = await this.findOneById(id);
+
+    await this.storieRepository.save({
+      ...storie,
+      is,
+    });
+    */
+  }
 }

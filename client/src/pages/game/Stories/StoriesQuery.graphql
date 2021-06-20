@@ -1,0 +1,7 @@
+query StoriesQuery($gameId: String!){
+  stories(gameId: $gameId){
+    id
+    storieName
+    isVoted
+  }
+}

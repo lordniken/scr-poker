@@ -15,4 +15,7 @@ export class GameEntity extends Base {
 
   @Column({ type: 'boolean' })
   allowSpectators: boolean;
+
+  @Column('text', { default: null })
+  currentVotingStorie: string | null;
 }

@@ -1,0 +1,3 @@
+mutation ChangeGameStatusMutation($data: GameVotingDto!){
+  changeGameStatus(data: $data)
+}

@@ -1,10 +1,18 @@
-import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Resolver, Query } from '@nestjs/graphql';
-import { GameCreateDto } from 'src/dto';
+import { Inject, UseGuards } from '@nestjs/common';
+import {
+  Args,
+  Context,
+  Mutation,
+  Resolver,
+  Query,
+  Subscription,
+} from '@nestjs/graphql';
+import { GameCreateDto, GameVotingDto } from 'src/dto';
 import { Game, GameInfo, User } from 'src/models';
 import { GameService } from './game.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { StorieService } from '../storie/storie.service';
+import { PubSubEngine } from 'graphql-subscriptions';
 
 @Resolver(() => Boolean)
 @UseGuards(new AuthGuard())
@@ -12,6 +20,7 @@ export class GameResolver {
   constructor(
     private readonly gameService: GameService,
     private readonly storieService: StorieService,
+    @Inject('PUB_SUB') private pubSub: PubSubEngine,
   ) {}
 
   @Mutation(() => Game)
@@ -36,5 +45,17 @@ export class GameResolver {
     const gameInfo = await this.gameService.findGameById(gameId, userId);
 
     return gameInfo;
+  }
+
+  @Mutation(() => Boolean)
+  async changeGameStatus(@Args('data') data: GameVotingDto): Promise<boolean> {
+    await this.gameService.changeGameStatus(data);
+
+    return true;
+  }
+
+  @Subscription((returns) => String)
+  commentAdded() {
+    return this.pubSub.asyncIterator('commentAdded');
   }
 }

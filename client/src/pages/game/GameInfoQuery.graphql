@@ -3,7 +3,7 @@ query GameInfoQuery($gameId: String!){
     gameName
     votingSystem
     allowSpectators
-    stories
     isGameOwner
+    currentVotingStorie
   }
 }

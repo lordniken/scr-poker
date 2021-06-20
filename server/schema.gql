@@ -23,6 +23,7 @@ type Game {
   gameName: String!
   votingSystem: String!
   allowSpectators: Boolean!
+  currentVotingStorie: String
 }
 
 type GameInfo {
@@ -32,6 +33,7 @@ type GameInfo {
   gameName: String!
   votingSystem: String!
   allowSpectators: Boolean!
+  currentVotingStorie: String
   isGameOwner: Boolean!
 }
 
@@ -40,6 +42,7 @@ type Storie {
   created: DateTime!
   updated: DateTime!
   storieName: String!
+  isVoted: Boolean!
 }
 
 type Query {
@@ -56,6 +59,9 @@ input UserAuthDto {
 
 type Mutation {
   createGame(data: GameCreateDto!): Game!
+  changeGameStatus(data: GameVotingDto!): Boolean!
+  startRound(id: String!): Boolean!
+  test: String!
   createUser(data: UserRegistrationDto!): String!
 }
 
@@ -66,9 +72,18 @@ input GameCreateDto {
   stories: [String!]!
 }
 
+input GameVotingDto {
+  gameId: String!
+  storieId: String!
+}
+
 input UserRegistrationDto {
   username: String!
   email: String
   passwordHash: String
   role: String
+}
+
+type Subscription {
+  commentAdded: String!
 }

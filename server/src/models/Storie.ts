@@ -7,4 +7,8 @@ export class Storie extends Base {
   @Expose()
   @Field()
   storieName: string;
+
+  @Expose()
+  @Field()
+  isVoted: boolean;
 }

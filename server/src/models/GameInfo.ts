@@ -6,5 +6,5 @@ import { Game } from './Game';
 export class GameInfo extends Game {
   @Expose()
   @Field()
-  isGameOwner: boolean;
+  isGameOwner?: boolean;
 }
