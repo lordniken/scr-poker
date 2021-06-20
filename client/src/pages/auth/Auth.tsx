@@ -23,7 +23,7 @@ const Auth: React.FC = () => {
   const [createUser] = useMutation(BasicCreateUserMutation, {
     onCompleted: ({ createUser: userToken }) => {
       setValue('scr-poker-token', userToken);
-      window.location.href = '/dashboard';
+      window.location.href = '/new-game';
     },
   });
   const onSubmit = React.useCallback(({ username }: typeof INITIAL_VALUES) => 

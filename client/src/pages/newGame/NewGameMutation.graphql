@@ -1,0 +1,5 @@
+mutation NewGameMutation($data: GameCreateDto!) {
+  createGame(data: $data){
+    id
+  }
+}

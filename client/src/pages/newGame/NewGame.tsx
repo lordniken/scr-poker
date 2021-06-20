@@ -20,9 +20,12 @@ import {
 import { TextField, Select, CheckBox } from 'components';
 import { yupResolver } from '@hookform/resolvers/yup';
 import RemoveIcon from '@material-ui/icons/RemoveCircle';
-import { DashboardStruct } from '../dashboard';
+import { useHistory } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
+import NewGameMutation from './NewGameMutation.graphql';
 import { newGameStyles } from './styles';
 import { newGameValidationSchema } from './validation';
+import { DashboardStruct } from '../dashboard';
 
 interface IStorie {
   id: string;
@@ -31,20 +34,21 @@ interface IStorie {
 
 interface IFormValues {
   gameName: string;
-  voteSystem: string;
+  votingSystem: string;
   allowSpectators: boolean;
   stories: string[];
 };
 
 const INITIAL_VALUES: IFormValues = {
   gameName: '',
-  voteSystem: 'fibonacci',
+  votingSystem: 'fibonacci',
   allowSpectators: false,
   stories: [],
 };
 
 const NewGame: React.FC = () => {
   const styles = newGameStyles();
+  const history = useHistory();
   const [stories, setStory] = React.useState<IStorie[]>([]);
   const storieRef = React.useRef<HTMLInputElement>();
   const { handleSubmit, control, setValue, formState: { isValid } } = useForm({ 
@@ -68,7 +72,12 @@ const NewGame: React.FC = () => {
   const handleUsRemove = React.useCallback(id => {
     setStory(stories.filter(us => us.id !== id));
   }, [stories]);
-  const onSubmit = (e: any) => alert(JSON.stringify(e));
+  const [createGame] = useMutation(NewGameMutation, {
+    onCompleted: ({ createGame: { id } }) => {
+      history.push(`/game/${id}`);
+    },
+  });
+  const onSubmit = (values: IFormValues) => createGame({ variables: { data: values } });
 
   React.useEffect(() => {
     setValue('stories', stories.map(storie => storie.value));
@@ -87,7 +96,7 @@ const NewGame: React.FC = () => {
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
             label="Voting system"
-            name="voteSystem"
+            name="votingSystem"
             control={control}
           >
             <MenuItem value="fibonacci">Fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
