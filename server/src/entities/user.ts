@@ -1,5 +1,5 @@
 import { Entity, Column } from 'typeorm';
-import { UserRoleType } from 'src/dto/role';
+import { UserRoleType } from 'src/enums';
 import { Base } from 'src/entities/base';
 
 @Entity('users')

@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { UserRoleType } from './role';
+import { UserRoleType } from '../enums';
 
 @InputType()
 export class UserRegistrationDto {
