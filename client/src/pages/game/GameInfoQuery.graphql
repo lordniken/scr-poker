@@ -1,0 +1,9 @@
+query GameInfoQuery($gameId: String!){
+  gameInfo(gameId: $gameId){
+    gameName
+    votingSystem
+    allowSpectators
+    stories
+    isGameOwner
+  }
+}

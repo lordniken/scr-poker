@@ -4,11 +4,15 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useApolloClient } from '@apollo/client';
 import { useLocation } from 'react-router-dom';
 import { FlexBox } from 'components';
+import { useGameIdSelector } from 'hooks';
 import routes from 'global/router/routes';
+import GameInfoQuery from 'pages/game/GameInfoQuery.graphql';
 import { headerStyles } from './styles';
 import MeQuery from '../Auth/MeQuery.graphql';
 
 const Header: React.FC = () => {
+  const { pathname } = useLocation();
+  const gameId = useGameIdSelector();
   const styles = headerStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = React.useMemo(() => Boolean(anchorEl), [anchorEl]);
@@ -22,10 +26,17 @@ const Header: React.FC = () => {
   const { me: { username = '' } } = client.readQuery({
     query: MeQuery,
   });
-  const { pathname } = useLocation();
-  const title = React.useMemo(() => 
-    routes.find(route => route.path === pathname)?.title || '', [pathname]);
-
+  const gameInfoQuery = client.readQuery({
+    query: GameInfoQuery,
+    variables: {
+      gameId,
+    },
+  });  
+  const title = React.useMemo(() => {
+    const basicTitle = routes.find(route => route.path === pathname)?.title || '';
+    return gameId ? gameInfoQuery?.gameInfo?.gameName : basicTitle;
+  }, [pathname, gameId, gameInfoQuery?.gameInfo?.gameName]);
+  
   return (
     <AppBar position="static">
       <Toolbar>

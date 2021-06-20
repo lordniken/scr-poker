@@ -1,4 +1,4 @@
-import { Auth, Dashboard, NewGame } from 'pages';
+import { Auth, Dashboard, Game, NewGame } from 'pages';
 
 const routes: TRoute[] = [
   {
@@ -20,6 +20,13 @@ const routes: TRoute[] = [
     title: 'New game',
     exact: true,
     component: NewGame,
+    private: true,
+  },
+  {
+    path: '/game',
+    title: 'Game',
+    exact: false,
+    component: Game,
     private: true,
   },  
 ];
