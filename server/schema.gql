@@ -23,7 +23,6 @@ type Game {
   gameName: String!
   votingSystem: String!
   allowSpectators: Boolean!
-  stories: [String!]!
 }
 
 type GameInfo {
@@ -33,14 +32,21 @@ type GameInfo {
   gameName: String!
   votingSystem: String!
   allowSpectators: Boolean!
-  stories: [String!]!
   isGameOwner: Boolean!
+}
+
+type Storie {
+  id: ID!
+  created: DateTime!
+  updated: DateTime!
+  storieName: String!
 }
 
 type Query {
   auth(data: UserAuthDto!): String!
   me: User!
   gameInfo(gameId: String!): GameInfo!
+  stories(gameId: String!): [Storie!]!
 }
 
 input UserAuthDto {

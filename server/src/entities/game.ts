@@ -15,7 +15,4 @@ export class GameEntity extends Base {
 
   @Column({ type: 'boolean' })
   allowSpectators: boolean;
-
-  @Column('simple-array')
-  stories: string[];
 }

@@ -20,8 +20,4 @@ export class Game extends Base {
   @Expose()
   @Field()
   allowSpectators: boolean;
-
-  @Expose()
-  @Field(() => [String])
-  stories: string[];
 }
