@@ -8,6 +8,7 @@ export const config = ConfigModule.forRoot();
 export const graphql = GraphQLModule.forRoot({
   debug: false,
   playground: true,
+  installSubscriptionHandlers: true,
   autoSchemaFile: 'schema.gql',
   formatError: (error: GraphQLError) => {
     const graphQLFormattedError: GraphQLFormattedError = {
@@ -15,7 +16,8 @@ export const graphql = GraphQLModule.forRoot({
     };
     return graphQLFormattedError;
   },
-  context: ({ req }) => ({ headers: req.headers }),
+  context: ({ req, connection }) =>
+    connection ? { req: connection.context } : { req },
 });
 
 export const postgres = TypeOrmModule.forRoot({

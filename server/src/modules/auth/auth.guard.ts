@@ -12,11 +12,12 @@ import * as jwt from 'jsonwebtoken';
 export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context).getContext();
+    const authData = ctx.req.headers?.authorization ?? ctx.req?.Authorization;
 
-    if (!ctx.headers?.authorization) {
+    if (!authData) {
       return false;
     }
-    ctx.user = await this.validateToken(ctx.headers.authorization);
+    ctx.user = await this.validateToken(authData);
     return true;
   }
 

@@ -1,5 +1,6 @@
 import { Global, Module, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { PubSub } from 'graphql-subscriptions';
 import { config, graphql, postgres } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -19,8 +20,13 @@ Promise.all(
   @Global()
   @Module({
     imports: [...modules, config, graphql, postgres],
-    providers: [],
-    exports: [],
+    providers: [
+      {
+        provide: 'PUB_SUB',
+        useValue: new PubSub(),
+      },
+    ],
+    exports: ['PUB_SUB'],
   })
   class Application {}
 
