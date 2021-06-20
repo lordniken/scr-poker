@@ -1,2 +1,3 @@
 export { User } from './User';
-export { NewGame } from './NewGame';
+export { Game } from './Game';
+export { GameInfo } from './GameInfo';

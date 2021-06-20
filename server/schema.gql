@@ -16,7 +16,7 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type NewGame {
+type Game {
   id: String!
   created: DateTime!
   updated: DateTime!
@@ -26,9 +26,21 @@ type NewGame {
   stories: [String!]!
 }
 
+type GameInfo {
+  id: String!
+  created: DateTime!
+  updated: DateTime!
+  gameName: String!
+  votingSystem: String!
+  allowSpectators: Boolean!
+  stories: [String!]!
+  isGameOwner: Boolean!
+}
+
 type Query {
   auth(data: UserAuthDto!): String!
   me: User!
+  gameInfo(gameId: String!): GameInfo!
 }
 
 input UserAuthDto {
@@ -37,7 +49,7 @@ input UserAuthDto {
 }
 
 type Mutation {
-  createGame(data: GameCreateDto!): NewGame!
+  createGame(data: GameCreateDto!): Game!
   createUser(data: UserRegistrationDto!): String!
 }
 

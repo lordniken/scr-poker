@@ -4,7 +4,7 @@ import { GameVotingSystemType } from 'src/enums';
 import { Base } from './Base';
 
 @ObjectType()
-export class NewGame extends Base {
+export class Game extends Base {
   @Expose()
   @Field()
   id: string;
