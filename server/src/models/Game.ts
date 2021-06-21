@@ -1,7 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Expose } from 'class-transformer';
+import { Expose, plainToClass, Transform } from 'class-transformer';
 import { GameVotingSystemType } from 'src/enums';
 import { Base } from './Base';
+import { GameStatus } from './GameStatus';
 
 @ObjectType()
 export class Game extends Base {
@@ -22,6 +23,15 @@ export class Game extends Base {
   allowSpectators: boolean;
 
   @Expose()
-  @Field({ nullable: true })
-  currentVotingStorie: string;
+  @Transform(({ obj }) =>
+    plainToClass(GameStatus, obj, {
+      excludeExtraneousValues: true,
+    }),
+  )
+  @Field()
+  status: GameStatus;
+
+  @Expose()
+  @Field()
+  ownerId: string;
 }

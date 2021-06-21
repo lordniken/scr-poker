@@ -1,0 +1,6 @@
+subscription GameStatusChangedSubscription{
+  gameStatusChanged{
+    isVotingStarted
+    votingStorieId
+  }
+}

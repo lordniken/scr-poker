@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { plainToClass } from 'class-transformer';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto, GameVotingDto } from 'src/dto';
-import { Game, GameInfo } from 'src/models';
+import { Game } from 'src/models';
+import { GameStatus } from 'src/models/GameStatus';
 
 @Injectable()
 export class GameService {
@@ -14,37 +16,42 @@ export class GameService {
 
   async create(data: GameCreateDto, ownerId: string): Promise<Game> {
     const newGameQuery = await this.gamesRepository.create({
-      ownerId,
       ...data,
+      ownerId,
     });
     const newGame = await this.gamesRepository.save(newGameQuery);
 
-    return newGame;
+    return plainToClass(Game, newGame, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async findGameById(id: string, userId?: string): Promise<GameInfo> {
-    const gameInfo = await this.gamesRepository.findOne({ id });
+  async findGameById(id: string): Promise<Game> {
+    const game = await this.gamesRepository.findOne({ id });
 
-    if (!userId) {
-      return gameInfo;
-    }
-
-    return {
-      isGameOwner: userId === gameInfo.ownerId,
-      ...gameInfo,
-    };
+    return plainToClass(Game, game, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  async changeGameStatus({ gameId, storieId }: GameVotingDto) {
+  async changeGameStatus({
+    gameId,
+    storieId,
+  }: GameVotingDto): Promise<GameStatus> {
     const game = await this.findGameById(gameId);
 
-    if (game.currentVotingStorie) {
+    if (game.status.isVotingStarted) {
       storieId = null;
     }
 
-    await this.gamesRepository.save({
+    const savedGame = await this.gamesRepository.save({
       ...game,
-      currentVotingStorie: storieId,
+      votingStorieId: storieId,
+      isVotingStarted: !!storieId,
+    });
+
+    return plainToClass(GameStatus, savedGame, {
+      excludeExtraneousValues: true,
     });
   }
 }

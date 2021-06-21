@@ -77,7 +77,7 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
                 key={storie.id} 
                 button 
                 onClick={() => setSelectedStorie(storie.id)}
-                selected={storie.id === currentVotingStorie ?? selectedStorie === storie.id}
+                selected={currentVotingStorie ? storie.id === currentVotingStorie : selectedStorie === storie.id}
                 disabled={isVoting && isGameOwner}
               >
                 <Typography>{storie.storieName}</Typography>

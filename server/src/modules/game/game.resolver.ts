@@ -13,6 +13,8 @@ import { GameService } from './game.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { StorieService } from '../storie/storie.service';
 import { PubSubEngine } from 'graphql-subscriptions';
+import { events } from 'src/enums';
+import { GameStatus } from 'src/models/GameStatus';
 
 @Resolver(() => Boolean)
 @UseGuards(new AuthGuard())
@@ -30,8 +32,10 @@ export class GameResolver {
   ): Promise<Game> {
     const newGame = await this.gameService.create(data, userId);
 
-    data.stories.forEach((storie) =>
-      this.storieService.create(newGame.id, storie),
+    await Promise.all(
+      data.stories.map((storie) =>
+        this.storieService.create(newGame.id, storie),
+      ),
     );
 
     return newGame;
@@ -42,20 +46,27 @@ export class GameResolver {
     @Context('user') { id: userId }: User,
     @Args('gameId') gameId: string,
   ): Promise<GameInfo> {
-    const gameInfo = await this.gameService.findGameById(gameId, userId);
+    const game = await this.gameService.findGameById(gameId);
 
-    return gameInfo;
+    return {
+      ...game,
+      isGameOwner: userId === game.ownerId,
+    };
   }
 
   @Mutation(() => Boolean)
   async changeGameStatus(@Args('data') data: GameVotingDto): Promise<boolean> {
-    await this.gameService.changeGameStatus(data);
+    const result = await this.gameService.changeGameStatus(data);
+
+    this.pubSub.publish(events.gameStatusChanged, {
+      gameStatusChanged: result,
+    });
 
     return true;
   }
 
-  @Subscription((returns) => String)
-  commentAdded() {
-    return this.pubSub.asyncIterator('commentAdded');
+  @Subscription(() => GameStatus)
+  gameStatusChanged() {
+    return this.pubSub.asyncIterator(events.gameStatusChanged);
   }
 }

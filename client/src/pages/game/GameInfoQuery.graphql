@@ -4,6 +4,9 @@ query GameInfoQuery($gameId: String!){
     votingSystem
     allowSpectators
     isGameOwner
-    currentVotingStorie
+    status{
+      isVotingStarted
+      votingStorieId
+    }
   }
 }
