@@ -5,16 +5,15 @@ import {
   ApolloProvider,
   createHttpLink,
   InMemoryCache,
+  split,
 } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
 import { setContext } from '@apollo/client/link/context';
+import { getMainDefinition } from '@apollo/client/utilities';
 import { useGlobalStyles } from 'hooks';
 import { getValue } from 'utils';
 import { renderRoutes, routes } from 'global/router';
 import { AuthProvider } from '../Auth';
-
-const httpLink = createHttpLink({
-  uri: 'http://localhost:5000/graphql',
-});
 
 const authLink = setContext((_, { headers }) => {
   const token = getValue('scr-poker-token');
@@ -27,8 +26,38 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const httpLink = createHttpLink({
+  uri: 'http://localhost:5000/graphql',
+});
+
+const wsLink = () => {
+  const token = getValue('scr-poker-token');
+
+  return new WebSocketLink({
+    uri: 'ws://localhost:5000/graphql',
+    options: {
+      reconnect: true,
+      connectionParams: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+};
+
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink(),
+  authLink.concat(httpLink),
+);
+
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: splitLink,
   cache: new InMemoryCache(),
 });
 

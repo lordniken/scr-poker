@@ -56,6 +56,7 @@
     "react-dom": "^17.0.1",
     "react-hook-form": "^7.0.5",
     "react-router-dom": "^5.2.0",
+    "subscriptions-transport-ws": "^0.9.19",
     "uuid": "^8.3.2",
     "yarn": "^1.22.10",
     "yup": "^0.32.9"
