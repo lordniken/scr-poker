@@ -66,7 +66,6 @@ const NewGame: React.FC = () => {
         id: uuid(),
         value: storieRef!.current!.value,
       }]);
-      storieRef!.current!.value = '';
     }
   }, []);
   const handleUsRemove = React.useCallback(id => {
@@ -80,7 +79,8 @@ const NewGame: React.FC = () => {
   const onSubmit = (values: IFormValues) => createGame({ variables: { data: values } });
 
   React.useEffect(() => {
-    setValue('stories', stories.map(storie => storie.value));
+    setValue('stories', stories.map(storie => storie.value), { shouldValidate: true });
+    storieRef!.current!.value = '';
   }, [JSON.stringify(stories)]);
   
   return (

@@ -2,6 +2,7 @@ query GameInfoQuery($gameId: String!){
   gameInfo(gameId: $gameId){
     gameName
     votingSystem
+    cards
     allowSpectators
     isGameOwner
     status{
