@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Expose, plainToClass, Transform } from 'class-transformer';
 import { GameVotingSystemType } from 'src/enums';
+import { CARD_VALUES } from 'src/utils/constants';
 import { Base } from './Base';
 import { GameStatus } from './GameStatus';
 
@@ -17,6 +18,11 @@ export class Game extends Base {
   @Expose()
   @Field()
   votingSystem: GameVotingSystemType;
+
+  @Expose()
+  @Transform(({ obj }) => CARD_VALUES.get(obj.votingSystem))
+  @Field(() => [String])
+  cards: string[];
 
   @Expose()
   @Field()

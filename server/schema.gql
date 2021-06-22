@@ -27,6 +27,7 @@ type Game {
   updated: DateTime!
   gameName: String!
   votingSystem: String!
+  cards: [String!]!
   allowSpectators: Boolean!
   status: GameStatus!
   ownerId: String!
@@ -38,6 +39,7 @@ type GameInfo {
   updated: DateTime!
   gameName: String!
   votingSystem: String!
+  cards: [String!]!
   allowSpectators: Boolean!
   status: GameStatus!
   ownerId: String!
