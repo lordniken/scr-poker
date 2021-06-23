@@ -2,6 +2,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 export const config = ConfigModule.forRoot();
 
@@ -29,4 +30,10 @@ export const postgres = TypeOrmModule.forRoot({
   database: process.env.DB_NAME,
   autoLoadEntities: true,
   synchronize: true,
+});
+
+export const redis = RedisModule.forRoot({
+  config: {
+    url: `redis://${process.env.REDIS_HOST}:6379`,
+  },
 });

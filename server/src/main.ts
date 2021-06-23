@@ -1,7 +1,7 @@
 import { Global, Module, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { PubSub } from 'graphql-subscriptions';
-import { config, graphql, postgres } from './utils';
+import { config, graphql, postgres, redis } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as colors from 'colors';
@@ -19,7 +19,7 @@ Promise.all(
 ).then(async (modules) => {
   @Global()
   @Module({
-    imports: [...modules, config, graphql, postgres],
+    imports: [...modules, config, graphql, postgres, redis],
     providers: [
       {
         provide: 'PUB_SUB',
