@@ -1,7 +1,8 @@
 import { Inject, UseGuards } from '@nestjs/common';
-import { Args, Resolver, Query, Mutation } from '@nestjs/graphql';
+import { Args, Resolver, Query, Mutation, Context } from '@nestjs/graphql';
 import { PubSubEngine } from 'graphql-subscriptions';
-import { Storie } from 'src/models';
+import { StorieVotingDto } from 'src/dto';
+import { Storie, User } from 'src/models';
 import { AuthGuard } from '../auth/auth.guard';
 import { StorieService } from './storie.service';
 
@@ -21,8 +22,11 @@ export class StorieResolver {
   }
 
   @Mutation(() => Boolean)
-  async startRound(@Args('id') id: string): Promise<boolean> {
-    await this.storieService.startStorieVote(id);
+  async vote(
+    @Context('user') { id: userId }: User,
+    @Args('data') data: StorieVotingDto,
+  ): Promise<boolean> {
+    await this.storieService.vote(data, userId);
 
     return true;
   }

@@ -1,18 +1,40 @@
 import React from 'react';
+import { useMutation } from '@apollo/client';
 import { Card, FlexBox } from 'components';
+import { useGameIdSelector } from 'hooks';
 import { gameControlsStyles } from './styles';
+import GameControlsVoteMutation from './GameControlsVoteMutation.graphql';
 
 interface IProps {
   cards: string[];
+  storieId: string;
   isVotingStarted: boolean;
+  votedCard: string;
 }
 
-const GameControls: React.FC<IProps> = ({ cards, isVotingStarted }) => {
-  const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
+const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, votedCard }) => {
   const styles = gameControlsStyles();
-  const onCardSelected = React.useCallback((card) => {
-    setSelectedCard(prev => prev === card ? null : card)
-  }, []);
+  const gameId = useGameIdSelector();
+  const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
+  const [vote] = useMutation(GameControlsVoteMutation, {
+    onCompleted: () => console.log('OK'),
+  });
+  const onCardSelected = React.useCallback((value) => {
+    setSelectedCard(prev => prev === value ? null : value);
+    vote({
+      variables: {
+        data: {
+          gameId,
+          storieId,
+          value,
+        },
+      },
+    });
+  }, [gameId, storieId]);
+
+  React.useEffect(() => {
+    setSelectedCard(votedCard);
+  }, [votedCard]);
 
   return (
     <FlexBox 
@@ -21,7 +43,7 @@ const GameControls: React.FC<IProps> = ({ cards, isVotingStarted }) => {
     >
       {
         cards && cards.map(card => {
-          const isSelected = selectedCard === card;
+          const isSelected = card === selectedCard;
 
           return (
             <Card 

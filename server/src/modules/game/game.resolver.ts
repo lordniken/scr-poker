@@ -47,10 +47,17 @@ export class GameResolver {
     @Args('gameId') gameId: string,
   ): Promise<GameInfo> {
     const game = await this.gameService.findGameById(gameId);
+    const vote = await this.storieService.findVoteByUserId(
+      gameId,
+      game.status.votingStorieId,
+      userId,
+    );
+    const votedScore = vote?.value;
 
     return {
       ...game,
       isGameOwner: userId === game.ownerId,
+      votedScore,
     };
   }
 

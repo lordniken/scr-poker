@@ -1,14 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Expose } from 'class-transformer';
-import { Game } from './Game';
 
 @ObjectType()
-export class GameInfo extends Game {
+export class Vote {
   @Expose()
   @Field()
-  isGameOwner?: boolean;
+  userId: string;
 
   @Expose()
-  @Field({ nullable: true })
-  votedScore: string;
+  @Field()
+  value: string;
 }

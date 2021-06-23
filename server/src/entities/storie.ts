@@ -1,5 +1,6 @@
 import { Entity, Column } from 'typeorm';
 import { Base } from 'src/entities/base';
+import { Vote } from 'src/models';
 
 @Entity('stories')
 export class StorieEntity extends Base {
@@ -12,8 +13,6 @@ export class StorieEntity extends Base {
   @Column('boolean', { default: false })
   isVoted: boolean;
 
-  /*
-  @Column("int", { array: true })
-  votes: number[];
-  */
+  @Column('jsonb', { default: null })
+  votes: Vote[];
 }

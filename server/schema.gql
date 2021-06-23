@@ -44,6 +44,12 @@ type GameInfo {
   status: GameStatus!
   ownerId: String!
   isGameOwner: Boolean!
+  votedScore: String
+}
+
+type Vote {
+  userId: String!
+  value: String!
 }
 
 type Storie {
@@ -52,6 +58,7 @@ type Storie {
   updated: DateTime!
   storieName: String!
   isVoted: Boolean!
+  votes: [Vote!]
 }
 
 type Query {
@@ -69,7 +76,7 @@ input UserAuthDto {
 type Mutation {
   createGame(data: GameCreateDto!): Game!
   changeGameStatus(data: GameVotingDto!): Boolean!
-  startRound(id: String!): Boolean!
+  vote(data: StorieVotingDto!): Boolean!
   createUser(data: UserRegistrationDto!): String!
 }
 
@@ -83,6 +90,12 @@ input GameCreateDto {
 input GameVotingDto {
   gameId: String!
   storieId: String!
+}
+
+input StorieVotingDto {
+  gameId: String!
+  storieId: String!
+  value: String
 }
 
 input UserRegistrationDto {

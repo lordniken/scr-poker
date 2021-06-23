@@ -24,7 +24,12 @@ const Game: React.FC = () => {
       gameId,
     },
   });
-  const { isGameOwner, status: { votingStorieId = null, isVotingStarted = false } = {}, cards } = gameInfo;
+  const { 
+    isGameOwner, 
+    status: { votingStorieId = null, isVotingStarted = false } = {}, 
+    cards, 
+    votedScore,
+  } = gameInfo;
   const activeStorieTitle = React.useMemo(() => {
     const activeStorie = (stories as IStorie[]).find(storie => storie.id === votingStorieId);
 
@@ -45,7 +50,12 @@ const Game: React.FC = () => {
           <Stories isGameOwner={isGameOwner} currentVotingStorie={votingStorieId} />
         </FlexBox>
       </FlexBox>
-      <GameControls cards={cards} isVotingStarted={isVotingStarted} />
+      <GameControls 
+        cards={cards} 
+        isVotingStarted={isVotingStarted} 
+        storieId={votingStorieId}
+        votedCard={votedScore}
+      />
     </FlexBox>
   );
 };
