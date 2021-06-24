@@ -55,8 +55,6 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
     });
   };
   const isVoting = React.useMemo(() => Boolean(currentVotingStorie), [currentVotingStorie]);
-  const buttonTitle = React.useMemo(() => 
-    isVoting ? 'Stop voting' : 'Start new round', [isVoting]);
 
   React.useEffect(() => {
     setValue('storieId', currentVotingStorie ?? selectedStorie, { shouldValidate: true });
@@ -90,12 +88,12 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
           isGameOwner && (
             <Button
               variant="contained" 
-              color="primary" 
+              color={isVoting ? 'secondary' : 'primary'}
               type="submit"
               fullWidth
               disabled={!isValid}
             >
-              {buttonTitle}
+              {isVoting ? 'Show cards' : 'Start new round'}
             </Button>
           )
         }

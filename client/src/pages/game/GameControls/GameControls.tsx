@@ -54,7 +54,7 @@ const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, vote
             >
               {card}
             </Card>
-          )
+          );
         })
       }
     </FlexBox>
