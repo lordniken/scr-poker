@@ -1,10 +1,10 @@
 import { Global, Module, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { PubSub } from 'graphql-subscriptions';
 import { config, graphql, postgres, redis } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as colors from 'colors';
+import { GlobalRepository } from './utils/GlobalRepository';
 
 const port = process.env.PORT || 5000;
 
@@ -23,10 +23,14 @@ Promise.all(
     providers: [
       {
         provide: 'PUB_SUB',
-        useValue: new PubSub(),
+        useValue: GlobalRepository.getPubSub(),
+      },
+      {
+        provide: 'REDIS',
+        useValue: GlobalRepository.getRedis(),
       },
     ],
-    exports: ['PUB_SUB'],
+    exports: ['PUB_SUB', 'REDIS'],
   })
   class Application {}
 

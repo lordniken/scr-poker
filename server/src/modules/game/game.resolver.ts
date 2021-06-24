@@ -15,12 +15,14 @@ import { StorieService } from '../storie/storie.service';
 import { PubSubEngine } from 'graphql-subscriptions';
 import { events } from 'src/enums';
 import { GameStatus } from 'src/models/GameStatus';
+import { UserService } from '../user/user.service';
 
 @Resolver(() => Boolean)
 @UseGuards(new AuthGuard())
 export class GameResolver {
   constructor(
     private readonly gameService: GameService,
+    private readonly userService: UserService,
     private readonly storieService: StorieService,
     @Inject('PUB_SUB') private pubSub: PubSubEngine,
   ) {}
@@ -53,11 +55,18 @@ export class GameResolver {
       userId,
     );
     const votedScore = vote?.value;
+    const onlineList = await this.gameService.updateOnlineList(gameId, userId);
+    const { username } = await this.userService.findUserById(userId);
+
+    this.pubSub.publish(events.userJoined, {
+      userJoined: username,
+    });
 
     return {
       ...game,
       isGameOwner: userId === game.ownerId,
       votedScore,
+      onlineList,
     };
   }
 
@@ -75,5 +84,15 @@ export class GameResolver {
   @Subscription(() => GameStatus)
   gameStatusChanged() {
     return this.pubSub.asyncIterator(events.gameStatusChanged);
+  }
+
+  @Subscription(() => String)
+  userJoined() {
+    return this.pubSub.asyncIterator(events.userJoined);
+  }
+
+  @Subscription(() => String)
+  userDisconnected() {
+    return this.pubSub.asyncIterator(events.userDisconnected);
   }
 }

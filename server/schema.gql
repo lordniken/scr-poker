@@ -45,6 +45,7 @@ type GameInfo {
   ownerId: String!
   isGameOwner: Boolean!
   votedScore: String
+  onlineList: [String!]
 }
 
 type Vote {
@@ -107,4 +108,6 @@ input UserRegistrationDto {
 
 type Subscription {
   gameStatusChanged: GameStatus!
+  userJoined: String!
+  userDisconnected: String!
 }

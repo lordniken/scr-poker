@@ -3,6 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import * as jwt from 'jsonwebtoken';
+import { GlobalRepository } from './GlobalRepository';
+import { deserializeArray, serialize } from 'class-transformer';
+import { events } from 'src/enums';
+import { getConnection } from 'typeorm';
+import { UserEntity } from 'src/entities';
 
 export const config = ConfigModule.forRoot();
 
@@ -10,6 +16,40 @@ export const graphql = GraphQLModule.forRoot({
   debug: false,
   playground: true,
   installSubscriptionHandlers: true,
+  subscriptions: {
+    onDisconnect: async (_, context) => {
+      const redis = GlobalRepository.getRedis();
+      const { Authorization } = await context.initPromise;
+      const token = Authorization.split(' ')[1];
+
+      try {
+        const { id } = jwt.verify(token, process.env.JWT_SECRET) as {
+          id: string;
+        };
+
+        redis.keys('online_*', (_, keys) => {
+          keys.forEach(async (key) => {
+            try {
+              const onlineList = deserializeArray(String, await redis.get(key));
+
+              await redis.set(
+                key,
+                serialize(onlineList.filter((user) => user !== id)),
+              );
+
+              const { username = '' } = await getConnection()
+                .getRepository(UserEntity)
+                .findOne({ id });
+
+              GlobalRepository.getPubSub().publish(events.userDisconnected, {
+                userDisconnected: username,
+              });
+            } catch {}
+          });
+        });
+      } catch {}
+    },
+  },
   autoSchemaFile: 'schema.gql',
   formatError: (error: GraphQLError) => {
     const graphQLFormattedError: GraphQLFormattedError = {

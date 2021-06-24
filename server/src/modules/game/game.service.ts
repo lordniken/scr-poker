@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { plainToClass } from 'class-transformer';
+import { deserializeArray, plainToClass, serialize } from 'class-transformer';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto, GameVotingDto } from 'src/dto';
 import { Game } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class GameService {
   constructor(
+    @InjectRedis()
+    private readonly redis: Redis,
     @InjectRepository(GameEntity)
     private gamesRepository: Repository<GameEntity>,
+    private readonly userService: UserService,
   ) {}
 
   async create(data: GameCreateDto, ownerId: string): Promise<Game> {
@@ -32,6 +37,29 @@ export class GameService {
     return plainToClass(Game, game, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async updateOnlineList(gameId: string, userId: string): Promise<string[]> {
+    const redisKey = `online_${gameId}`;
+    const redisOnlineList = await this.redis.get(redisKey);
+
+    if (!redisOnlineList) {
+      await this.redis.set(redisKey, serialize([userId]));
+      return;
+    }
+
+    const onlineList = deserializeArray(String, redisOnlineList);
+    const newOnlineList = new Set([...onlineList, userId]);
+
+    await this.redis.set(redisKey, serialize(newOnlineList));
+
+    const userList = await Promise.all(
+      [...newOnlineList].map((user: string) =>
+        this.userService.findUserById(user),
+      ),
+    );
+
+    return userList.map((user) => user.username);
   }
 
   async changeGameStatus({

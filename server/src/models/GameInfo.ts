@@ -11,4 +11,8 @@ export class GameInfo extends Game {
   @Expose()
   @Field({ nullable: true })
   votedScore: string;
+
+  @Expose()
+  @Field(() => [String], { nullable: true })
+  onlineList: string[];
 }
