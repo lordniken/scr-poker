@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { FlexBox } from 'components';
 import { useGameIdSelector } from 'hooks';
-import StoriesQuery from './StoriesQuery.graphql';
+import GameStoriesQuery from './GameStoriesQuery.graphql';
 import ChangeGameStatusMutation from './ChangeGameStatusMutation.graphql';
 import { storieValidationSchema } from './validation';
 
@@ -32,8 +32,8 @@ const INITIAL_VALUES = {
 
 const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
   const gameId = useGameIdSelector();
-  const [selectedStorie, setSelectedStorie] = React.useState<string>('');
-  const { data : { stories = [] } = {}, loading } = useQuery(StoriesQuery, {
+  const [selectedStorie, setSelectedStorie] = React.useState<string | null>(null);
+  const { data : { stories = [] } = {}, loading } = useQuery(GameStoriesQuery, {
     variables: {
       gameId,
     },

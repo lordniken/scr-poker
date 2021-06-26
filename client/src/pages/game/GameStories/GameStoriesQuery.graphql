@@ -1,4 +1,4 @@
-query StoriesQuery($gameId: String!){
+query GameStoriesQuery($gameId: String!){
   stories(gameId: $gameId){
     id
     storieName

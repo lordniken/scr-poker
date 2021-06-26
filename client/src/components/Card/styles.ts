@@ -2,8 +2,8 @@ import { makeStyles } from '@material-ui/core';
 
 export const cardStyles = makeStyles((theme) => ({
   card: {
-    width: 60,
-    height: 100,
+    width: 50,
+    height: 80,
     border: `2px solid ${theme.palette.primary.main}`,
     borderRadius: theme.spacing(1),
     color: theme.palette.primary.main,
@@ -11,6 +11,7 @@ export const cardStyles = makeStyles((theme) => ({
     '&:disabled': {
       borderColor: theme.palette.grey[300],
       color: theme.palette.grey[300],
+      backgroundColor: 'inherit',
     },
   },
   selected: {

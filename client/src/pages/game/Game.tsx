@@ -4,10 +4,10 @@ import { Header } from 'containers';
 import { useGameIdSelector } from 'hooks';
 import { FlexBox } from 'components';
 import GameInfoQuery from './GameInfoQuery.graphql';
-import StoriesQuery from './Stories/StoriesQuery.graphql';
-import Stories from './Stories';
+import GameStoriesQuery from './GameStories/GameStoriesQuery.graphql';
+import GameStories from './GameStories';
 import GameField from './GameField';
-import { IStorie } from './Stories/Stories';
+import { IStorie } from './GameStories/GameStories';
 import useGameSubscriptions from './useGameSubscriptions';
 import GameControls from './GameControls';
 
@@ -19,7 +19,7 @@ const Game: React.FC = () => {
       gameId,
     },
   });
-  const { data : { stories = [] } = {} } = useQuery(StoriesQuery, {
+  const { data : { stories = [] } = {} } = useQuery(GameStoriesQuery, {
     variables: {
       gameId,
     },
@@ -42,13 +42,13 @@ const Game: React.FC = () => {
       <Header />
       <FlexBox 
         padding={2} 
-        justifyContent="space-between" 
-        width="100%"
+        justifyContent="space-beetween" 
         marginBottom={10}
+        width='100%'
       >
         <GameField title={activeStorieTitle} onlineList={onlineList} />
         <FlexBox flexDirection="column" width={400}>
-          <Stories isGameOwner={isGameOwner} currentVotingStorie={votingStorieId} />
+          <GameStories isGameOwner={isGameOwner} currentVotingStorie={votingStorieId} />
         </FlexBox>
       </FlexBox>
       <GameControls 
@@ -60,5 +60,5 @@ const Game: React.FC = () => {
     </FlexBox>
   );
 };
-
+// <GameField title={activeStorieTitle} onlineList={onlineList} />
 export default Game;

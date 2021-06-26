@@ -5,6 +5,7 @@ export const gameControlsStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
     borderRadius: theme.spacing(1),
     padding: theme.spacing(6),
-    width: 1000,
+    width: 800,
+    gridArea: 'a',
   },
 }));
