@@ -86,8 +86,15 @@ export class GameResolver {
   }
 
   @Mutation(() => Boolean)
-  async changeGameStatus(@Args('data') data: GameVotingDto): Promise<boolean> {
-    const result = await this.gameService.changeGameStatus(data);
+  async changeGameStatus(
+    @Args('data') { gameId, storieId }: GameVotingDto,
+    @Context('user') { id: userId }: User,
+  ): Promise<boolean> {
+    const result = await this.gameService.changeGameStatus(
+      gameId,
+      storieId,
+      userId,
+    );
 
     this.pubSub.publish(events.gameStatusChanged, {
       gameStatusChanged: result,

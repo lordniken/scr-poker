@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { deserializeArray, plainToClass, serialize } from 'class-transformer';
 import { GameEntity } from 'src/entities';
-import { GameCreateDto, GameVotingDto } from 'src/dto';
+import { GameCreateDto } from 'src/dto';
 import { Game, User } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
@@ -65,12 +65,13 @@ export class GameService {
     return userList;
   }
 
-  async changeGameStatus({
-    gameId,
-    storieId,
-  }: GameVotingDto): Promise<GameStatus> {
+  async changeGameStatus(gameId, storieId, userId): Promise<GameStatus> {
     const game = await this.findGameById(gameId);
     let votes;
+
+    if (game.ownerId !== userId) {
+      return;
+    }
 
     if (game.status.isVotingStarted) {
       votes = await this.storieService.finishVoting(
