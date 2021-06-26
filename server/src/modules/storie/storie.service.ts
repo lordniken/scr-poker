@@ -75,6 +75,37 @@ export class StorieService {
     return [...votes, vote];
   }
 
+  async removeVotesById(gameId: string, storieId: string): Promise<void> {
+    const redisKey = `votes_${gameId}_${storieId}`;
+
+    await this.redis.del(redisKey);
+  }
+
+  async saveVotes(gameId: string, storieId: string): Promise<Vote[]> {
+    const redisKey = `votes_${gameId}_${storieId}`;
+    const storie = await this.storieRepository.findOne({
+      id: storieId,
+      gameId,
+    });
+
+    const votes = await this.redis.get(redisKey);
+
+    await this.storieRepository.save({
+      ...storie,
+      isVoted: true,
+      votes: deserializeArray(Vote, votes),
+    });
+
+    return deserializeArray(Vote, votes);
+  }
+
+  async finishVoting(gameId: string, storieId: string): Promise<Vote[]> {
+    const votes = await this.saveVotes(gameId, storieId);
+    await this.removeVotesById(gameId, storieId);
+
+    return votes;
+  }
+
   async vote(
     { gameId, storieId, value }: StorieVotingDto,
     userId: string,

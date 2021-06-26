@@ -5,6 +5,7 @@ import GameStatusChangedSubscription from './GameStatusChangedSubscription.graph
 import GameUserJoinedSubscription from './GameUserJoinedSubscription.graphql';
 import GameUserDisconnectedSubscription from './GameUserDisconnectedSubscription.graphql';
 import GameInfoQuery from './GameInfoQuery.graphql';
+import GameVotesUpdated from './GameVotesUpdated.graphql';
 
 const useGameSubscriptions = () => {
   const client = useApolloClient();
@@ -83,6 +84,29 @@ const useGameSubscriptions = () => {
       });
     },
   });
+
+  useSubscription(GameVotesUpdated, {
+    onSubscriptionData: ({ subscriptionData: { data: { updateUserVotes } } }) => {
+      client.cache.modify({
+        id: client.cache.identify(makeReference('ROOT_QUERY')),
+        fields: {
+          gameInfo(existing) {
+            const gameInfo = { 
+              ...existing, 
+              status: {
+                ...existing.status,
+                votedUsers: updateUserVotes,
+              },
+            };
+
+            return gameInfo;
+          },
+        },
+        optimistic: true,
+      });
+    },
+  });
+  
 };
 
 export default useGameSubscriptions;

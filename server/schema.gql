@@ -111,4 +111,5 @@ type Subscription {
   gameStatusChanged: GameStatus!
   userJoined: User!
   userDisconnected: String!
+  updateUserVotes: [Vote!]!
 }

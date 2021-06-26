@@ -8,6 +8,7 @@ import { Game, User } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UserService } from '../user/user.service';
+import { StorieService } from '../storie/storie.service';
 
 @Injectable()
 export class GameService {
@@ -17,6 +18,7 @@ export class GameService {
     @InjectRepository(GameEntity)
     private gamesRepository: Repository<GameEntity>,
     private readonly userService: UserService,
+    private readonly storieService: StorieService,
   ) {}
 
   async create(data: GameCreateDto, ownerId: string): Promise<Game> {
@@ -68,15 +70,23 @@ export class GameService {
     storieId,
   }: GameVotingDto): Promise<GameStatus> {
     const game = await this.findGameById(gameId);
+    let votes;
 
-    if (game.status.votingStorieId === storieId) {
-    }
-
-    /*
     if (game.status.isVotingStarted) {
-      storieId = null;
+      votes = await this.storieService.finishVoting(
+        gameId,
+        game.status.votingStorieId,
+      );
+    } else {
+      const votedUserList = await this.storieService.findVotesByGameId(
+        gameId,
+        storieId,
+      );
+      votes = votedUserList?.map((user) => ({
+        ...user,
+        value: game.status.isVotingStarted ? null : user.value,
+      }));
     }
-    */
 
     const savedGame = await this.gamesRepository.save({
       ...game,
@@ -84,8 +94,15 @@ export class GameService {
       isVotingStarted: !game.status.isVotingStarted,
     });
 
-    return plainToClass(GameStatus, savedGame, {
-      excludeExtraneousValues: true,
-    });
+    return plainToClass(
+      GameStatus,
+      {
+        ...savedGame,
+        votedUsers: votes,
+      },
+      {
+        excludeExtraneousValues: true,
+      },
+    );
   }
 }

@@ -16,9 +16,7 @@ const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, vote
   const styles = gameControlsStyles();
   const gameId = useGameIdSelector();
   const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
-  const [vote] = useMutation(GameControlsVoteMutation, {
-    onCompleted: () => console.log('OK'),
-  });
+  const [vote] = useMutation(GameControlsVoteMutation);
   const onCardSelected = React.useCallback((value) => {
     setSelectedCard(prev => prev === value ? null : value);
     vote({
@@ -33,8 +31,16 @@ const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, vote
   }, [gameId, storieId]);
 
   React.useEffect(() => {
-    setSelectedCard(votedCard);
-  }, [votedCard]);
+    if (isVotingStarted){
+      setSelectedCard(votedCard);
+    }
+  }, [votedCard, isVotingStarted]);
+
+  React.useEffect(() => {
+    if (!isVotingStarted){
+      setSelectedCard(null);
+    }
+  }, [isVotingStarted]);  
 
   return (
     <FlexBox 
