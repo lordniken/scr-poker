@@ -24,6 +24,16 @@ const useGameSubscriptions = () => {
         },
         optimistic: true,
       });
+
+      client.cache.modify({
+        id: `Storie:${status.votingStorieId}`,
+        fields: {
+          isVoted() {
+            return !status.isVotingStarted;
+          },
+        },
+        optimistic: true,
+      });
     },
   });
 
