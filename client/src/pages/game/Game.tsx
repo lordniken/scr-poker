@@ -50,7 +50,14 @@ const Game: React.FC = () => {
         marginBottom={10}
         width='100%'
       >
-        <GameField title={activeStorieTitle} onlineList={onlineList} votedUsers={votedUsers} />
+        <GameField title={activeStorieTitle} onlineList={onlineList} votedUsers={votedUsers}>
+          <GameControls 
+            cards={cards} 
+            isVotingStarted={isVotingStarted} 
+            storieId={votingStorieId}
+            votedCard={votedScore}
+          />
+        </GameField>
         <FlexBox flexDirection="column" width={400}>
           <GameStories 
             isGameOwner={isGameOwner} 
@@ -59,12 +66,6 @@ const Game: React.FC = () => {
           />
         </FlexBox>
       </FlexBox>
-      <GameControls 
-        cards={cards} 
-        isVotingStarted={isVotingStarted} 
-        storieId={votingStorieId}
-        votedCard={votedScore}
-      />
     </FlexBox>
   );
 };

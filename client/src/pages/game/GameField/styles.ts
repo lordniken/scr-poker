@@ -6,7 +6,7 @@ export const gameFieldStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   table: {
-    padding: theme.spacing(10),
+    padding: theme.spacing(5, 2),
     backgroundColor: theme.palette.background.paper,
     borderRadius: theme.spacing(2),
     border: `1px solid ${theme.palette.grey[300]}`,

@@ -3,11 +3,13 @@ import { Button, Container, List, ListItem, Typography } from '@material-ui/core
 import { useMutation, useQuery } from '@apollo/client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import cn from 'classnames';
 import { FlexBox } from 'components';
 import { useGameIdSelector } from 'hooks';
 import GameStoriesQuery from './GameStoriesQuery.graphql';
 import ChangeGameStatusMutation from './ChangeGameStatusMutation.graphql';
 import { storieValidationSchema } from './validation';
+import { gameStoriesStyles } from './styles';
 
 interface IProps {
   isGameOwner: boolean;
@@ -25,6 +27,7 @@ export interface IStorie {
   id: string;
   storieName: string;
   status: StorieStatus;
+  isVoted: boolean;
 }
 
 const INITIAL_VALUES = {
@@ -33,6 +36,7 @@ const INITIAL_VALUES = {
 
 const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingStarted }) => {
   const gameId = useGameIdSelector();
+  const styles = gameStoriesStyles();
   const [selectedStorie, setSelectedStorie] = React.useState<string>('');
   const { data : { stories = [] } = {}, loading } = useQuery(GameStoriesQuery, {
     variables: {
@@ -82,7 +86,7 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingS
                 selected={isVotingStarted ? storie.id === currentVotingStorie : selectedStorie === storie.id}
                 disabled={isVotingStarted && isGameOwner}
               >
-                <Typography>{storie.storieName}</Typography>
+                <Typography className={cn({ [styles.completedStory]: storie.isVoted })}>{storie.storieName}</Typography>
               </ListItem>,
             )
           }

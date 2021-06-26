@@ -44,7 +44,8 @@ const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, vote
 
   return (
     <FlexBox 
-      justifyContent="space-around" 
+      justifyContent="space-around"
+      flexWrap="wrap"
       className={styles.container}
     >
       {
@@ -52,14 +53,15 @@ const GameControls: React.FC<IProps> = ({ cards, storieId, isVotingStarted, vote
           const isSelected = card === selectedCard;
 
           return (
-            <Card 
-              key={card} 
-              disabled={!isVotingStarted}
-              selected={isSelected}
-              onClick={() => onCardSelected(card)}
-            >
-              {card}
-            </Card>
+            <FlexBox key={card} paddingX={0.5} paddingY={0.5}>
+              <Card 
+                disabled={!isVotingStarted}
+                selected={isSelected}
+                onClick={() => onCardSelected(card)}
+              >
+                {card}
+              </Card>
+            </FlexBox>
           );
         })
       }

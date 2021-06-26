@@ -31,9 +31,13 @@ const GameField: React.FC<IProps> = ({ children, title, onlineList = [], votedUs
       <FlexBox 
         alignItems="center"
         justifyContent="center"
+        flexDirection="column"
         className={styles.table}
       >
-        <Typography align="center">{title}</Typography>
+        <FlexBox paddingBottom={2}>
+          <Typography>{title}</Typography>
+        </FlexBox>
+        {children}
       </FlexBox>
       
       {onlineList.map((user: IUser, index) => {
@@ -54,7 +58,6 @@ const GameField: React.FC<IProps> = ({ children, title, onlineList = [], votedUs
           </FlexBox>
         );
       })}
-      {children}
     </FlexBox>
   );
 };

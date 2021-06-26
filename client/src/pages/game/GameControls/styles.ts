@@ -2,10 +2,9 @@ import { makeStyles } from '@material-ui/core';
 
 export const gameControlsStyles = makeStyles((theme) => ({
   container: {
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.spacing(1),
-    padding: theme.spacing(6),
-    width: 800,
-    gridArea: 'a',
+    padding: theme.spacing(1),
+  },
+  card: {
+    margin: theme.spacing(1),
   },
 }));
