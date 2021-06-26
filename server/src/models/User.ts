@@ -10,9 +10,9 @@ export class User extends Base {
 
   @Expose()
   @Field({ nullable: true })
-  email: string;
+  email?: string;
 
   @Expose()
   @Field({ nullable: true })
-  role: string;
+  role?: string;
 }

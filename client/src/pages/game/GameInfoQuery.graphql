@@ -6,7 +6,10 @@ query GameInfoQuery($gameId: String!){
     allowSpectators
     isGameOwner
     votedScore
-    onlineList
+    onlineList{
+      id
+      username
+    }
     status{
       isVotingStarted
       votingStorieId

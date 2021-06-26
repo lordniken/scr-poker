@@ -7,8 +7,7 @@ import * as jwt from 'jsonwebtoken';
 import { GlobalRepository } from './GlobalRepository';
 import { deserializeArray, serialize } from 'class-transformer';
 import { events } from 'src/enums';
-import { getConnection } from 'typeorm';
-import { UserEntity } from 'src/entities';
+import { User } from 'src/models';
 
 export const config = ConfigModule.forRoot();
 
@@ -30,22 +29,18 @@ export const graphql = GraphQLModule.forRoot({
         redis.keys('online_*', (_, keys) => {
           keys.forEach(async (key) => {
             try {
-              const onlineList = deserializeArray(String, await redis.get(key));
+              const onlineList = deserializeArray(User, await redis.get(key));
 
               await redis.set(
                 key,
-                serialize(onlineList.filter((user) => user !== id)),
+                serialize(onlineList.filter((user) => user.id !== id)),
               );
-
-              const { username = '' } = await getConnection()
-                .getRepository(UserEntity)
-                .findOne({ id });
-
-              GlobalRepository.getPubSub().publish(events.userDisconnected, {
-                userDisconnected: username,
-              });
             } catch {}
           });
+        });
+
+        GlobalRepository.getPubSub().publish(events.userDisconnected, {
+          userDisconnected: id,
         });
       } catch {}
     },

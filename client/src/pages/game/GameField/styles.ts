@@ -11,7 +11,7 @@ export const gameFieldStyles = makeStyles((theme) => ({
     borderRadius: theme.spacing(2),
     border: `1px solid ${theme.palette.grey[300]}`,
     width: '100%',
-    margin: '0 20%',
+    margin: '0 10%',
     order: 2,
   },
   userCard: {
@@ -19,5 +19,8 @@ export const gameFieldStyles = makeStyles((theme) => ({
     width: 100,
     textAlign: 'center',
     overflow: 'hidden',
+  },
+  username: {
+    paddingTop: theme.spacing(1),
   },
 }));

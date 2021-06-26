@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { deserializeArray, plainToClass, serialize } from 'class-transformer';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto, GameVotingDto } from 'src/dto';
-import { Game } from 'src/models';
+import { Game, User } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UserService } from '../user/user.service';
@@ -40,7 +40,7 @@ export class GameService {
     });
   }
 
-  async updateOnlineList(gameId: string, userId: string): Promise<string[]> {
+  async updateOnlineList(gameId: string, userId: string): Promise<User[]> {
     const redisKey = `online_${gameId}`;
     const redisOnlineList = await this.redis.get(redisKey);
 
@@ -60,7 +60,10 @@ export class GameService {
       ),
     );
 
-    return userList.map((user) => user.username);
+    return userList.map((user) => ({
+      id: user.id,
+      username: user.username,
+    }));
   }
 
   async changeGameStatus({

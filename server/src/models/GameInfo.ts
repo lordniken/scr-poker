@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Expose } from 'class-transformer';
 import { Game } from './Game';
+import { User } from './User';
 
 @ObjectType()
 export class GameInfo extends Game {
@@ -13,6 +14,6 @@ export class GameInfo extends Game {
   votedScore: string;
 
   @Expose()
-  @Field(() => [String], { nullable: true })
-  onlineList: string[];
+  @Field(() => [User], { nullable: true })
+  onlineList: User[];
 }

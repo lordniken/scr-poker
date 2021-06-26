@@ -56,10 +56,10 @@ export class GameResolver {
     );
     const votedScore = vote?.value;
     const onlineList = await this.gameService.updateOnlineList(gameId, userId);
-    const { username } = await this.userService.findUserById(userId);
+    const { id, username } = await this.userService.findUserById(userId);
 
     this.pubSub.publish(events.userJoined, {
-      userJoined: username,
+      userJoined: { id, username },
     });
 
     return {
@@ -86,7 +86,7 @@ export class GameResolver {
     return this.pubSub.asyncIterator(events.gameStatusChanged);
   }
 
-  @Subscription(() => String)
+  @Subscription(() => User)
   userJoined() {
     return this.pubSub.asyncIterator(events.userJoined);
   }

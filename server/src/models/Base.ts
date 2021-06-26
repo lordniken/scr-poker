@@ -9,9 +9,9 @@ export class Base {
 
   @Expose()
   @Field()
-  created: Date;
+  created?: Date;
 
   @Expose()
   @Field()
-  updated: Date;
+  updated?: Date;
 }
