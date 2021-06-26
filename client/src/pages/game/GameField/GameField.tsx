@@ -6,6 +6,7 @@ import { gameFieldStyles } from './styles';
 interface IProps {
   title: string;
   onlineList: IUser[];
+  votedUsers: IVote[];
 }
 
 interface IUser {
@@ -13,9 +14,13 @@ interface IUser {
   username: string;
 }
 
-const GameField: React.FC<IProps> = ({ children, title, onlineList = [] }) => {
+interface IVote {
+  userId: string;
+  value: string;
+}
+
+const GameField: React.FC<IProps> = ({ children, title, onlineList = [], votedUsers = [] }) => {
   const styles = gameFieldStyles();
-  // onlineList = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19'];
 
   return (
     <FlexBox 
@@ -31,18 +36,24 @@ const GameField: React.FC<IProps> = ({ children, title, onlineList = [] }) => {
         <Typography align="center">{title}</Typography>
       </FlexBox>
       
-      {onlineList.map((user: IUser, index) => (
-        <FlexBox
-          flexDirection="column"
-          alignItems="center"
-          key={user.id} 
-          order={index % 2 ? '3' : '1'}
-          className={styles.userCard}
-        >
-          <Card selected={false} disabled />
-          <Typography variant="caption" className={styles.username}>{user.username}</Typography>
-        </FlexBox>
-      ))}
+      {onlineList.map((user: IUser, index) => {
+        const votedUser = votedUsers?.find(vote => vote.userId === user.id);
+
+        return (
+          <FlexBox
+            flexDirection="column"
+            alignItems="center"
+            key={user.id} 
+            order={index % 2 ? '3' : '1'}
+            className={styles.userCard}
+          >
+            <Card selected={!!votedUser} disabled>
+              {votedUser?.value}
+            </Card>
+            <Typography variant="caption" className={styles.username}>{user.username}</Typography>
+          </FlexBox>
+        );
+      })}
       {children}
     </FlexBox>
   );

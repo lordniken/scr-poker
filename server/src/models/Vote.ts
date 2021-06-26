@@ -8,6 +8,6 @@ export class Vote {
   userId: string;
 
   @Expose()
-  @Field()
+  @Field({ nullable: true })
   value: string;
 }

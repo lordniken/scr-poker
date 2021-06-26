@@ -46,6 +46,13 @@ export class StorieService {
     return votes?.find((vote) => vote.userId === userId) ?? null;
   }
 
+  async findVotesByGameId(gameId: string, storieId: string): Promise<Vote[]> {
+    const redisVotes = await this.redis.get(`votes_${gameId}_${storieId}`);
+    const votes = deserializeArray(Vote, redisVotes);
+
+    return votes ?? null;
+  }
+
   makeNewVotes(userId: string, value: string, votes: Vote[]) {
     const voted = votes?.find((vote) => vote.userId === userId) ?? false;
 
@@ -76,7 +83,7 @@ export class StorieService {
     const redisVotes = await this.redis.get(redisKey);
     const votes = deserializeArray(Vote, redisVotes);
     const newVotes = this.makeNewVotes(userId, value, votes);
-    console.log('newVotes', newVotes);
+
     await this.redis.set(redisKey, serialize(newVotes));
   }
 }

@@ -7,7 +7,6 @@ import * as jwt from 'jsonwebtoken';
 import { GlobalRepository } from './GlobalRepository';
 import { deserializeArray, serialize } from 'class-transformer';
 import { events } from 'src/enums';
-import { User } from 'src/models';
 
 export const config = ConfigModule.forRoot();
 
@@ -19,7 +18,7 @@ export const graphql = GraphQLModule.forRoot({
     onDisconnect: async (_, context) => {
       const redis = GlobalRepository.getRedis();
       const { Authorization } = await context.initPromise;
-      const token = Authorization.split(' ')[1];
+      const token = Authorization?.split(' ')[1];
 
       try {
         const { id } = jwt.verify(token, process.env.JWT_SECRET) as {
@@ -29,11 +28,11 @@ export const graphql = GraphQLModule.forRoot({
         redis.keys('online_*', (_, keys) => {
           keys.forEach(async (key) => {
             try {
-              const onlineList = deserializeArray(User, await redis.get(key));
+              const onlineList = deserializeArray(String, await redis.get(key));
 
               await redis.set(
                 key,
-                serialize(onlineList.filter((user) => user.id !== id)),
+                serialize(onlineList.filter((user) => user !== id)),
               );
             } catch {}
           });

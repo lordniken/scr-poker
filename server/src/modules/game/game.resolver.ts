@@ -55,8 +55,16 @@ export class GameResolver {
       userId,
     );
     const votedScore = vote?.value;
-    const onlineList = await this.gameService.updateOnlineList(gameId, userId);
+    const onlineUsers = await this.gameService.updateOnlineList(gameId, userId);
+    const onlineList = onlineUsers?.map(({ id, username }) => ({
+      id,
+      username,
+    }));
     const { id, username } = await this.userService.findUserById(userId);
+    const votedUsers = await this.storieService.findVotesByGameId(
+      gameId,
+      game.status.votingStorieId,
+    );
 
     this.pubSub.publish(events.userJoined, {
       userJoined: { id, username },
@@ -67,15 +75,33 @@ export class GameResolver {
       isGameOwner: userId === game.ownerId,
       votedScore,
       onlineList,
+      status: {
+        ...game.status,
+        votedUsers: votedUsers?.map((user) => ({
+          ...user,
+          value: game.status.isVotingStarted ? null : user.value,
+        })),
+      },
     };
   }
 
   @Mutation(() => Boolean)
   async changeGameStatus(@Args('data') data: GameVotingDto): Promise<boolean> {
     const result = await this.gameService.changeGameStatus(data);
+    const votedUserList = await this.storieService.findVotesByGameId(
+      data.gameId,
+      data.storieId,
+    );
+    const votedUsers = votedUserList?.map((user) => ({
+      ...user,
+      value: result.isVotingStarted ? null : user.value,
+    }));
 
     this.pubSub.publish(events.gameStatusChanged, {
-      gameStatusChanged: result,
+      gameStatusChanged: {
+        ...result,
+        votedUsers,
+      },
     });
 
     return true;

@@ -16,9 +16,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Vote {
+  userId: String!
+  value: String
+}
+
 type GameStatus {
   isVotingStarted: Boolean!
   votingStorieId: String
+  votedUsers: [Vote!]
 }
 
 type Game {
@@ -46,11 +52,6 @@ type GameInfo {
   isGameOwner: Boolean!
   votedScore: String
   onlineList: [User!]
-}
-
-type Vote {
-  userId: String!
-  value: String!
 }
 
 type Storie {

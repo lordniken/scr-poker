@@ -13,6 +13,10 @@ query GameInfoQuery($gameId: String!){
     status{
       isVotingStarted
       votingStorieId
+      votedUsers{
+        userId
+        value
+      }
     }
   }
 }

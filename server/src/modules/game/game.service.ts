@@ -60,10 +60,7 @@ export class GameService {
       ),
     );
 
-    return userList.map((user) => ({
-      id: user.id,
-      username: user.username,
-    }));
+    return userList;
   }
 
   async changeGameStatus({
@@ -72,14 +69,19 @@ export class GameService {
   }: GameVotingDto): Promise<GameStatus> {
     const game = await this.findGameById(gameId);
 
+    if (game.status.votingStorieId === storieId) {
+    }
+
+    /*
     if (game.status.isVotingStarted) {
       storieId = null;
     }
+    */
 
     const savedGame = await this.gamesRepository.save({
       ...game,
       votingStorieId: storieId,
-      isVotingStarted: !!storieId,
+      isVotingStarted: !game.status.isVotingStarted,
     });
 
     return plainToClass(GameStatus, savedGame, {

@@ -12,6 +12,7 @@ import { storieValidationSchema } from './validation';
 interface IProps {
   isGameOwner: boolean;
   currentVotingStorie: string;
+  isVotingStarted: boolean;
 }
 
 enum StorieStatus {
@@ -30,9 +31,9 @@ const INITIAL_VALUES = {
   storieId: '',
 };
 
-const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
+const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingStarted }) => {
   const gameId = useGameIdSelector();
-  const [selectedStorie, setSelectedStorie] = React.useState<string | null>(null);
+  const [selectedStorie, setSelectedStorie] = React.useState<string>('');
   const { data : { stories = [] } = {}, loading } = useQuery(GameStoriesQuery, {
     variables: {
       gameId,
@@ -54,11 +55,14 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
       },
     });
   };
-  const isVoting = React.useMemo(() => Boolean(currentVotingStorie), [currentVotingStorie]);
 
   React.useEffect(() => {
-    setValue('storieId', currentVotingStorie ?? selectedStorie, { shouldValidate: true });
-  }, [selectedStorie, setValue, currentVotingStorie]);
+    setValue('storieId', selectedStorie, { shouldValidate: true });
+  }, [selectedStorie, setValue]);
+
+  React.useEffect(() => {
+    setSelectedStorie(currentVotingStorie);
+  }, [currentVotingStorie]);
 
   return (
     <FlexBox flexDirection="column" alignItems="center">
@@ -75,8 +79,8 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
                 key={storie.id} 
                 button 
                 onClick={() => setSelectedStorie(storie.id)}
-                selected={currentVotingStorie ? storie.id === currentVotingStorie : selectedStorie === storie.id}
-                disabled={isVoting && isGameOwner}
+                selected={isVotingStarted ? storie.id === currentVotingStorie : selectedStorie === storie.id}
+                disabled={isVotingStarted && isGameOwner}
               >
                 <Typography>{storie.storieName}</Typography>
               </ListItem>,
@@ -88,12 +92,12 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie }) => {
           isGameOwner && (
             <Button
               variant="contained" 
-              color={isVoting ? 'secondary' : 'primary'}
+              color={isVotingStarted ? 'secondary' : 'primary'}
               type="submit"
               fullWidth
               disabled={!isValid}
             >
-              {isVoting ? 'Show cards' : 'Start new round'}
+              {isVotingStarted ? 'Show cards' : 'Start new round'}
             </Button>
           )
         }

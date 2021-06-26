@@ -15,8 +15,8 @@ export const cardStyles = makeStyles((theme) => ({
     },
   },
   selected: {
-    backgroundColor: theme.palette.primary.light,
-    borderColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
+    backgroundColor: theme.palette.primary.light + ' !important',
+    borderColor: theme.palette.primary.light + ' !important',
+    color: theme.palette.primary.contrastText + ' !important',
   },
 }));

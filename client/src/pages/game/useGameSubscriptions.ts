@@ -40,20 +40,22 @@ const useGameSubscriptions = () => {
       }
       
       const { gameInfo } = data;
+      const isAlreadyOnline = !!gameInfo.onlineList.find((user: any) => user.id === userJoined.id);
+      const newOnlineList = isAlreadyOnline ? gameInfo.onlineList : [
+        ...gameInfo.onlineList, 
+        {
+          id: userJoined.id,
+          username: userJoined.username,
+          __typename: 'User',
+        },
+      ];
 
       client.writeQuery({
         query: GameInfoQuery,
         data: { 
           gameInfo: {
             ...gameInfo,
-            onlineList: [
-              ...gameInfo.onlineList,
-              {
-                id: userJoined.id,
-                username: userJoined.username,
-                __typename: 'User',
-              },
-            ],
+            onlineList: newOnlineList,
           },
         },
         variables: {
@@ -70,7 +72,7 @@ const useGameSubscriptions = () => {
         fields: {
           gameInfo(existing) {
             const gameInfo = { ...existing, 
-              onlineList: existing.onlineList.filter((user: any) => user.__ref !== `User:${userDisconnected}`) };
+              onlineList: existing.onlineList?.filter((user: any) => user.__ref !== `User:${userDisconnected}`) };
 
             client.cache.gc();
     
