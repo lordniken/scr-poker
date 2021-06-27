@@ -58,7 +58,7 @@ const Game: React.FC = () => {
             votedCard={votedScore}
           />
         </GameField>
-        <FlexBox flexDirection="column" width={400}>
+        <FlexBox flexDirection="column" width={500}>
           <GameStories 
             isGameOwner={isGameOwner} 
             currentVotingStorie={votingStorieId} 
@@ -69,5 +69,5 @@ const Game: React.FC = () => {
     </FlexBox>
   );
 };
-// <GameField title={activeStorieTitle} onlineList={onlineList} />
+
 export default Game;

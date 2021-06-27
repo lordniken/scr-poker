@@ -26,7 +26,10 @@ export class StorieService {
   }
 
   async findStoriesByGameId(gameId: string): Promise<Storie[]> {
-    const stories = await this.storieRepository.find({ gameId });
+    const stories = await this.storieRepository.find({
+      where: { gameId },
+      order: { created: 'ASC' },
+    });
 
     return stories;
   }
