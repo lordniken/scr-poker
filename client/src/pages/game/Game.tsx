@@ -10,6 +10,7 @@ import GameField from './GameField';
 import { IStorie } from './GameStories/GameStories';
 import useGameSubscriptions from './useGameSubscriptions';
 import GameControls from './GameControls';
+import GameResults from './GameResults';
 
 const Game: React.FC = () => {
   useGameSubscriptions();
@@ -39,7 +40,7 @@ const Game: React.FC = () => {
     const activeStorie = (stories as IStorie[]).find(storie => storie.id === votingStorieId);
 
     return activeStorie ? activeStorie.storieName : 'Waiting for start...';
-  }, [JSON.stringify(stories), votingStorieId]);
+  }, [JSON.stringify(stories), votingStorieId]);  
 
   return (
     <FlexBox flexDirection="column" alignItems="center">
@@ -66,6 +67,7 @@ const Game: React.FC = () => {
           />
         </FlexBox>
       </FlexBox>
+      <GameResults votedUsers={votedUsers} isVotingStarted={isVotingStarted} />
     </FlexBox>
   );
 };

@@ -14,7 +14,7 @@ interface IUser {
   username: string;
 }
 
-interface IVote {
+export interface IVote {
   userId: string;
   value: string;
 }
