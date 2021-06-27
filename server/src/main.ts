@@ -6,7 +6,7 @@ import * as path from 'path';
 import * as colors from 'colors';
 import { GlobalRepository } from './utils/GlobalRepository';
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 9911;
 
 Promise.all(
   fs.readdirSync(path.join(__dirname, 'modules')).map(async (moduleName) => {

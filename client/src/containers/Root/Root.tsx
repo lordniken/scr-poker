@@ -15,6 +15,15 @@ import { getValue } from 'utils';
 import { renderRoutes, routes } from 'global/router';
 import { AuthProvider } from '../Auth';
 
+const getProtocol = {
+  get http() {
+    return window.location.protocol === 'https:' ? 'https' : 'http';
+  },
+  get ws() {
+    return window.location.protocol === 'https:' ? 'wss' : 'ws';
+  },
+};
+
 const authLink = setContext((_, { headers }) => {
   const token = getValue('scr-poker-token');
 
@@ -27,14 +36,14 @@ const authLink = setContext((_, { headers }) => {
 });
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:5000/graphql',
+  uri: `${getProtocol.http}://${window.location.hostname}:${window.location.port}/graphql`,
 });
 
 const wsLink = () => {
   const token = getValue('scr-poker-token');
-
+  
   return new WebSocketLink({
-    uri: 'ws://localhost:5000/graphql',
+    uri: `${getProtocol.ws}://${window.location.hostname}:${window.location.port}/graphql`,
     options: {
       reconnect: true,
       connectionParams: {

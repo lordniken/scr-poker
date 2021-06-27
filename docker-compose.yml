@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  poker_srv:
+    container_name: poker_srv
+    build: server/
+    ports: 
+      - '9911:9911'
+    links:
+      - poker_postgres
+      - poker_redis
+  poker_postgres:
+    container_name: poker_pg
+    image: postgres:9.5.3
+    ports: 
+      - '27017:27017'
+  poker_redis:
+    container_name: poker_redis
+    image: redis:3.2.0
+    ports:
+      - '6379:6379'
+  poker_web:
+    container_name: poker_web
+    build: client/
+    ports: 
+      - '9910:80'
