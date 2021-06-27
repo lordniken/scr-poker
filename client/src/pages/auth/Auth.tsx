@@ -2,7 +2,9 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 import { Container, Paper, Typography, Link, Button, Box } from '@material-ui/core';
+import { useLocation } from 'react-router-dom';
 import { yupResolver } from '@hookform/resolvers/yup';
+import QueryString from 'query-string';
 import { FlexBox, TextField } from 'components';
 import { setValue } from 'utils';
 import { authStyles } from './styles';
@@ -20,10 +22,13 @@ const Auth: React.FC = () => {
     defaultValues: INITIAL_VALUES,
     resolver: yupResolver(authValidationSchema),
   });
+  const { search } = useLocation();
   const [createUser] = useMutation(BasicCreateUserMutation, {
     onCompleted: ({ createUser: userToken }) => {
+      const { redirect } = QueryString.parse(search);
+
       setValue('scr-poker-token', userToken);
-      window.location.href = '/new-game';
+      window.location.href = String(redirect);
     },
   });
   const onSubmit = React.useCallback(({ username }: typeof INITIAL_VALUES) => 
