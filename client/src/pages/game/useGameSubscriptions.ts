@@ -77,6 +77,9 @@ const useGameSubscriptions = () => {
   });
 
   useSubscription(GameUserDisconnectedSubscription, {
+    variables: {
+      gameId,
+    },
     onSubscriptionData: ({ subscriptionData: { data: { userDisconnected } } }) => {
       client.cache.modify({
         id: client.cache.identify(makeReference('ROOT_QUERY')),

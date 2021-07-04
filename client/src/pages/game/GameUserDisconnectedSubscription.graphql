@@ -1,3 +1,3 @@
-subscription GameUserDisconnectedSubscription{
-  userDisconnected
+subscription GameUserDisconnectedSubscription($gameId: String!){
+  userDisconnected(gameId: $gameId)
 }

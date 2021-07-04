@@ -29,17 +29,28 @@ export const graphql = GraphQLModule.forRoot({
           keys.forEach(async (key) => {
             try {
               const onlineList = deserializeArray(String, await redis.get(key));
-
-              await redis.set(
-                key,
-                serialize(onlineList.filter((user) => user !== id)),
+              const isUserFinded = Boolean(
+                onlineList.find((user) => user === id),
               );
+
+              if (isUserFinded) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const [_, gameId] = key.split('online_');
+
+                await redis.set(
+                  key,
+                  serialize(onlineList.filter((user) => user !== id)),
+                );
+
+                GlobalRepository.getPubSub().publish(events.userDisconnected, {
+                  userDisconnected: {
+                    id,
+                    gameId,
+                  },
+                });
+              }
             } catch {}
           });
-        });
-
-        GlobalRepository.getPubSub().publish(events.userDisconnected, {
-          userDisconnected: id,
         });
       } catch {}
     },

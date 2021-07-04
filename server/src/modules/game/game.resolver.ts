@@ -86,8 +86,15 @@ export class GameResolver {
     return this.pubSub.asyncIterator(events.userJoined);
   }
 
-  @Subscription(() => String)
-  userDisconnected() {
+  @Subscription(() => String, {
+    filter: ({ userDisconnected }, { gameId }) => {
+      return userDisconnected.gameId === gameId;
+    },
+    resolve(this: GameResolver, { userDisconnected }) {
+      return userDisconnected.id;
+    },
+  })
+  userDisconnected(@Args('gameId') gameId: string) {
     return this.pubSub.asyncIterator(events.userDisconnected);
   }
 }
