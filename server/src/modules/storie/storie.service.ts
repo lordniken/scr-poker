@@ -38,10 +38,6 @@ export class StorieService {
     return await this.storieRepository.findOne({ id });
   }
 
-  async fineOne(gameId: string, id: string): Promise<Storie> {
-    return await this.storieRepository.findOne({ gameId, id });
-  }
-
   async findVoteByUserId(gameId: string, id: string, userId): Promise<Vote> {
     const redisVotes = await this.redis.get(`votes_${gameId}_${id}`);
     const votes = deserializeArray(Vote, redisVotes);
@@ -51,9 +47,10 @@ export class StorieService {
 
   async findVotesByGameId(gameId: string, storieId: string): Promise<Vote[]> {
     const redisVotes = await this.redis.get(`votes_${gameId}_${storieId}`);
-    const votes = deserializeArray(Vote, redisVotes);
+    const storie = await this.findOneById(storieId);
 
-    return votes ?? null;
+    const votes = deserializeArray(Vote, redisVotes) ?? storie?.votes;
+    return votes;
   }
 
   makeNewVotes(userId: string, value: string, votes: Vote[]) {
@@ -78,12 +75,6 @@ export class StorieService {
     return [...votes, vote];
   }
 
-  async removeVotesById(gameId: string, storieId: string): Promise<void> {
-    const redisKey = `votes_${gameId}_${storieId}`;
-
-    await this.redis.del(redisKey);
-  }
-
   async saveVotes(gameId: string, storieId: string): Promise<Vote[]> {
     const redisKey = `votes_${gameId}_${storieId}`;
     const storie = await this.storieRepository.findOne({
@@ -104,7 +95,8 @@ export class StorieService {
 
   async finishVoting(gameId: string, storieId: string): Promise<Vote[]> {
     const votes = await this.saveVotes(gameId, storieId);
-    await this.removeVotesById(gameId, storieId);
+
+    await this.redis.del(`votes_${gameId}_${storieId}`);
 
     return votes;
   }

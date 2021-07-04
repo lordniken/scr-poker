@@ -48,41 +48,14 @@ export class GameResolver {
     @Context('user') { id: userId }: User,
     @Args('gameId') gameId: string,
   ): Promise<GameInfo> {
-    const game = await this.gameService.findGameById(gameId);
-    const vote = await this.storieService.findVoteByUserId(
-      gameId,
-      game.status.votingStorieId,
-      userId,
-    );
-    const votedScore = vote?.value;
-    const onlineUsers = await this.gameService.updateOnlineList(gameId, userId);
-    const onlineList = onlineUsers?.map(({ id, username }) => ({
-      id,
-      username,
-    }));
+    const gameInfo = await this.gameService.getGameInfo(gameId, userId);
     const { id, username } = await this.userService.findUserById(userId);
-    const votedUsers = await this.storieService.findVotesByGameId(
-      gameId,
-      game.status.votingStorieId,
-    );
 
     this.pubSub.publish(events.userJoined, {
       userJoined: { id, username },
     });
 
-    return {
-      ...game,
-      isGameOwner: userId === game.ownerId,
-      votedScore,
-      onlineList,
-      status: {
-        ...game.status,
-        votedUsers: votedUsers?.map((user) => ({
-          ...user,
-          value: game.status.isVotingStarted ? null : user.value,
-        })),
-      },
-    };
+    return gameInfo;
   }
 
   @Mutation(() => Boolean)

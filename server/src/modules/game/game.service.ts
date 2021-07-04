@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { deserializeArray, plainToClass, serialize } from 'class-transformer';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto } from 'src/dto';
-import { Game, User } from 'src/models';
+import { Game, GameInfo, User } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UserService } from '../user/user.service';
@@ -42,6 +42,47 @@ export class GameService {
     });
   }
 
+  async getGameStatus(game: Game): Promise<GameStatus> {
+    const votedUsers = await this.storieService.findVotesByGameId(
+      game.id,
+      game.status.votingStorieId,
+    );
+
+    return plainToClass(GameStatus, {
+      ...game.status,
+      votedUsers: votedUsers?.map((user) => ({
+        ...user,
+        value: game.status.isVotingStarted ? null : user.value,
+      })),
+    });
+  }
+
+  async getGameInfo(gameId: string, userId: string): Promise<GameInfo> {
+    const game = await this.findGameById(gameId);
+    const isGameOwner = userId === game.ownerId;
+    const userVote = await this.storieService.findVoteByUserId(
+      gameId,
+      game.status.votingStorieId,
+      userId,
+    );
+    const votedScore = userVote?.value;
+
+    const onlineUsers = await this.updateOnlineList(gameId, userId);
+    const onlineList = onlineUsers?.map(({ id, username }) => ({
+      id,
+      username,
+    }));
+    const gameStatus = await this.getGameStatus(game);
+
+    return plainToClass(GameInfo, {
+      ...game,
+      ...gameStatus,
+      votedScore,
+      onlineList,
+      isGameOwner,
+    });
+  }
+
   async updateOnlineList(gameId: string, userId: string): Promise<User[]> {
     const redisKey = `online_${gameId}`;
     const redisOnlineList = await this.redis.get(redisKey);
@@ -67,7 +108,7 @@ export class GameService {
 
   async changeGameStatus(gameId, storieId, userId): Promise<GameStatus> {
     const game = await this.findGameById(gameId);
-    let votes;
+    let votes = null;
 
     if (game.ownerId !== userId) {
       return;
@@ -78,15 +119,6 @@ export class GameService {
         gameId,
         game.status.votingStorieId,
       );
-    } else {
-      const votedUserList = await this.storieService.findVotesByGameId(
-        gameId,
-        storieId,
-      );
-      votes = votedUserList?.map((user) => ({
-        ...user,
-        value: game.status.isVotingStarted ? null : user.value,
-      }));
     }
 
     const savedGame = await this.gamesRepository.save({
