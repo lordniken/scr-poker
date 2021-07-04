@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { makeReference, useApolloClient, useSubscription } from '@apollo/client';
+import { makeReference, useApolloClient, useLazyQuery, useSubscription } from '@apollo/client';
 import { useGameIdSelector } from 'hooks';
+import MeQuery from 'containers/Auth/MeQuery.graphql';
 import GameStatusChangedSubscription from './GameStatusChangedSubscription.graphql';
 import GameUserJoinedSubscription from './GameUserJoinedSubscription.graphql';
 import GameUserDisconnectedSubscription from './GameUserDisconnectedSubscription.graphql';
@@ -76,6 +77,13 @@ const useGameSubscriptions = () => {
     },
   });
 
+  const [refreshGameInfo] = useLazyQuery(GameInfoQuery, {
+    fetchPolicy: 'network-only',
+    variables: {
+      gameId,
+    },
+  });
+
   useSubscription(GameUserDisconnectedSubscription, {
     variables: {
       gameId,
@@ -95,6 +103,13 @@ const useGameSubscriptions = () => {
         },
         optimistic: true,
       });
+      const { me: { id = null } = {} } = client.readQuery({
+        query: MeQuery,
+      }); 
+
+      if (id === userDisconnected) {
+        refreshGameInfo();
+      }
     },
   });
 

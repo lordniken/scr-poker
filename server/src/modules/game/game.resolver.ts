@@ -94,6 +94,7 @@ export class GameResolver {
       return userDisconnected.id;
     },
   })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userDisconnected(@Args('gameId') gameId: string) {
     return this.pubSub.asyncIterator(events.userDisconnected);
   }
