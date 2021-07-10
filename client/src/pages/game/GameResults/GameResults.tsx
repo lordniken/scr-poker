@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@material-ui/core';
 import { Card, FlexBox } from 'components';
+import VerticalProgress from 'components/VerticalProgress';
 import { IVote } from '../GameField/GameField';
 
 interface IProps {
@@ -35,7 +36,7 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
 
       setAverageScore(calcAverageScore);
 
-      const uniqueVoteValues = Array.from(new Set(votedUsers.map(vote => vote.value))).sort();
+      const uniqueVoteValues = Array.from(new Set(votedUsers.map(vote => vote.value)));
       uniqueVoteValues.forEach(value => {
         const votesCount = votedUsers.filter(vote => value === vote.value)?.length;
         setValueStats(prev => ([
@@ -68,17 +69,26 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
       </Box>
       <FlexBox>
         {
-          valueStats && valueStats.map(vote => (
-            <FlexBox
-              key={vote.value} 
-              flexDirection="column" 
-              alignItems="center"
-              padding={1}
-            >
-              <Card selected={false} >{vote.value}</Card>
-              <Typography>{vote.count} vote</Typography>
-            </FlexBox>
-          ))
+          valueStats && valueStats.map(vote => {
+            const totalVotesCount = votedUsers.length;
+            const progress = 100 / totalVotesCount * vote.count;
+            
+            return (
+              <FlexBox
+                key={vote.value} 
+                flexDirection="column" 
+                alignItems="center"
+                padding={1}
+              >
+                <VerticalProgress progress={progress} />
+                <Box padding={.5}>
+                  <Card selected={false}>{vote.value}</Card>
+                </Box>
+                <Typography>{vote.count} votes</Typography>
+              </FlexBox>
+            );
+          },
+          )
         }
       </FlexBox>
     </>

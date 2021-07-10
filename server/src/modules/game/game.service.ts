@@ -4,11 +4,12 @@ import { Repository } from 'typeorm';
 import { deserializeArray, plainToClass, serialize } from 'class-transformer';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto } from 'src/dto';
-import { Game, GameInfo, User } from 'src/models';
+import { Game, GameInfo, User, Vote } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { UserService } from '../user/user.service';
 import { StorieService } from '../storie/storie.service';
+import { replaceValues } from 'src/utils/filters';
 
 @Injectable()
 export class GameService {
@@ -42,15 +43,39 @@ export class GameService {
     });
   }
 
+  sortVotesByValue(votes: Vote[]): Vote[] {
+    const nomalizedVotes = replaceValues(
+      votes,
+      'value',
+      ['½', '?'],
+      ['0.5', 'Infinity'],
+    );
+
+    const sortedNomalizedVotes = nomalizedVotes?.sort((a, b) => {
+      return a.value - b.value;
+    });
+
+    const sortedVotes = replaceValues(
+      sortedNomalizedVotes,
+      'value',
+      ['0.5', 'Infinity'],
+      ['½', '?'],
+    );
+
+    return sortedVotes as Vote[];
+  }
+
   async getGameStatus(game: Game): Promise<GameStatus> {
-    const votedUsers = await this.storieService.findVotesByGameId(
+    const votes = await this.storieService.findVotesByGameId(
       game.id,
       game.status.votingStorieId,
     );
 
+    const sortedVotes = this.sortVotesByValue(votes);
+
     return plainToClass(GameStatus, {
       ...game.status,
-      votedUsers: votedUsers?.map((user) => ({
+      votedUsers: sortedVotes?.map((user) => ({
         ...user,
         value: game.status.isVotingStarted ? null : user.value,
       })),
@@ -115,10 +140,11 @@ export class GameService {
     }
 
     if (game.status.isVotingStarted) {
-      votes = await this.storieService.finishVoting(
+      const gameVotes = await this.storieService.finishVoting(
         gameId,
         game.status.votingStorieId,
       );
+      votes = this.sortVotesByValue(gameVotes);
     }
 
     const savedGame = await this.gamesRepository.save({
