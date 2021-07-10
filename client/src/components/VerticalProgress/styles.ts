@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core';
-import { IProps } from './VerticalProgress';
+import { IProps } from './types';
 
 export const verticalProgressStyles = makeStyles((theme) => ({
   root: (props: IProps) => ({
