@@ -1,0 +1,33 @@
+name: Server
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'server/**'
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v2
+      - name: Creating env file
+        run: |
+          touch server/.env
+          echo DB_NAME=poker >> server/.env
+          echo DB_HOST=poker_postgres >> server/.env
+          echo DB_USER=${{ secrets.DB_USER }} >> server/.env
+          echo DB_PWD= >> server/.env
+          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> server/.env
+          echo REDIS_HOST=poker_redis >> server/.env
+          cat server/.env
+      - name: Building
+        run: |
+          docker-compose -f ./docker-compose.yml up -d --build poker_srv

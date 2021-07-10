@@ -1,6 +1,6 @@
-import { Typography } from '@material-ui/core';
-import { Card, FlexBox } from 'components';
 import React from 'react';
+import { Box, Typography } from '@material-ui/core';
+import { Card, FlexBox } from 'components';
 import { IVote } from '../GameField/GameField';
 
 interface IProps {
@@ -22,7 +22,7 @@ const getAverageScore = (storieVotes: IVote[]) => {
   const votes = normalizedVotes.filter((vote) => Number(vote.value));
   const votesSum = votes.reduce((acc, vote) => acc + Number(vote.value), 0);
 
-  return votesSum / votes.length || 0;
+  return Math.floor(votesSum / votes.length * 100) / 100 || 0;
 };
 
 const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
@@ -62,7 +62,10 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
 
   return (
     <>
-      <Typography>Average score: {averageScore}</Typography>
+      <Box>
+        <Typography display="inline">Average score:&nbsp;</Typography>
+        <Typography display="inline" variant="h6">{averageScore}</Typography>
+      </Box>
       <FlexBox>
         {
           valueStats && valueStats.map(vote => (

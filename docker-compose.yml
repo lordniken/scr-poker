@@ -11,9 +11,15 @@ services:
       - poker_redis
   poker_postgres:
     container_name: poker_pg
-    image: postgres:9.5.3
+    build: db/
     ports: 
-      - '27017:27017'
+      - '5432:5432'
+    volumes:
+      - ./data:/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+      POSTGRES_DB: poker
   poker_redis:
     container_name: poker_redis
     image: redis:3.2.0

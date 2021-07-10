@@ -1,0 +1,23 @@
+name: Client
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'client/**'
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v2
+      - name: Building
+        run: |
+          docker-compose -f ./docker-compose.yml up -d --build poker_web
