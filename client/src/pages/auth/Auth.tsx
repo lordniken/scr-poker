@@ -44,7 +44,7 @@ const Auth: React.FC = () => {
       <Paper className={styles.paper}>
         <Container maxWidth="xs" component="form" onSubmit={handleSubmit(onSubmit)}>
           <FlexBox alignItems="center" flexDirection="column">
-            <Typography variant="h1" align="center">Introduce yourself!</Typography>
+            <Typography variant="h1" align="center">Introduce yourself</Typography>
             <Box alignItems="center" flexDirection="column" className={styles.form}>
               <TextField
                 name="username"
