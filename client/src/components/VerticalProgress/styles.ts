@@ -19,6 +19,7 @@ export const verticalProgressStyles = makeStyles((theme) => ({
       backgroundColor: theme.palette.primary.main,
       borderRadius: theme.spacing(1),
       margin: 1,
+      opacity: props.highlighted ? 1 : .3,
     },
   }),
 }));

@@ -57,6 +57,12 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
     }
   }, [isVotingStarted]);
 
+  const highlighedVotes = React.useMemo(() => {
+    const maxCountOfVotes = valueStats.reduce((acc, current) => (acc > current.count) ? acc : current.count, 0);
+
+    return valueStats.filter(vote => vote.count === maxCountOfVotes);
+  }, [valueStats]);
+
   if (isVotingStarted || !valueStats.length) {
     return null;
   }
@@ -71,8 +77,9 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
         {
           valueStats && valueStats.map(vote => {
             const totalVotesCount = votedUsers.length;
-            const progress = 100 / totalVotesCount * vote.count;
-            
+            const progress = Math.floor(100 / totalVotesCount * vote.count);
+            const isHighlighted = highlighedVotes.includes(vote);
+
             return (
               <FlexBox
                 key={vote.value} 
@@ -80,7 +87,7 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
                 alignItems="center"
                 padding={1}
               >
-                <VerticalProgress progress={progress} />
+                <VerticalProgress progress={progress} highlighted={isHighlighted} />
                 <Box padding={.5}>
                   <Card selected={false}>{vote.value}</Card>
                 </Box>
