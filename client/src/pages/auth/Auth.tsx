@@ -10,6 +10,7 @@ import { setValue } from 'utils';
 import { authStyles } from './styles';
 import { authValidationSchema } from './validation';
 import BasicCreateUserMutation from './BasicAuthMutation.graphql';
+import { AUTH } from '../../constants';
 
 const INITIAL_VALUES = {
   username: '',
@@ -53,6 +54,7 @@ const Auth: React.FC = () => {
                 fullWidth
                 className={styles.input}
                 inputRef={inputRef}
+                inputProps={{ maxLength: AUTH.MAX_LENGTH }}
                 control={control}
                 errors={errors}
               />
