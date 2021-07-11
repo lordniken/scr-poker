@@ -54,23 +54,29 @@ const Header: React.FC = () => {
           >
             <AccountCircle />
           </IconButton>
-          <Menu
-            id="menu-appbar"
-            anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            open={open}
-            onClose={handleClose}
-          >
-            <MenuItem onClick={handleClose}>Выход</MenuItem>
-          </Menu>
+          {
+            /*
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={open}
+              onClose={handleClose}
+            >
+              
+              <MenuItem onClick={handleClose}>Выход</MenuItem>
+              
+            </Menu>
+            */
+          }
         </FlexBox>
       </Toolbar>
     </AppBar>
