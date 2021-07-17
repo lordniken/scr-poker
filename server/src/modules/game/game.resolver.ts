@@ -34,12 +34,6 @@ export class GameResolver {
   ): Promise<Game> {
     const newGame = await this.gameService.create(data, userId);
 
-    await Promise.all(
-      data.stories.map((storie) =>
-        this.storieService.create(newGame.id, storie),
-      ),
-    );
-
     return newGame;
   }
 

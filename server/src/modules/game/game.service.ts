@@ -28,7 +28,9 @@ export class GameService {
       ownerId,
     });
     const newGame = await this.gamesRepository.save(newGameQuery);
-    this.updateOnlineList(newGame.id, ownerId);
+
+    await this.storieService.createStories(newGame.id, data.stories);
+    await this.updateOnlineList(newGame.id, ownerId);
 
     return plainToClass(Game, newGame, {
       excludeExtraneousValues: true,

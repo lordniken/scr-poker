@@ -17,12 +17,22 @@ export class StorieService {
   ) {}
 
   async create(gameId: string, storieName: string): Promise<Storie> {
-    const newGameQuery = await this.storieRepository.create({
+    const createdStorie = await this.storieRepository.create({
       gameId,
       storieName,
     });
 
-    return await this.storieRepository.save(newGameQuery);
+    return await this.storieRepository.save(createdStorie);
+  }
+
+  async createStories(gameId: string, stories: string[]): Promise<void> {
+    const createPromise = (storie) => {
+      return new Promise((resolve) => resolve(this.create(gameId, storie)));
+    };
+
+    for (const create of stories.map((storie) => () => createPromise(storie))) {
+      await create();
+    }
   }
 
   async findStoriesByGameId(gameId: string): Promise<Storie[]> {
@@ -53,7 +63,7 @@ export class StorieService {
     return votes;
   }
 
-  makeNewVotes(userId: string, value: string, votes: Vote[]) {
+  updateVotes(userId: string, value: string, votes: Vote[]) {
     const voted = votes?.find((vote) => vote.userId === userId) ?? false;
 
     if (voted) {
@@ -108,7 +118,7 @@ export class StorieService {
     const redisKey = `votes_${gameId}_${storieId}`;
     const redisVotes = await this.redis.get(redisKey);
     const votes = deserializeArray(Vote, redisVotes);
-    const newVotes = this.makeNewVotes(userId, value, votes);
+    const newVotes = this.updateVotes(userId, value, votes);
 
     await this.redis.set(redisKey, serialize(newVotes));
   }
