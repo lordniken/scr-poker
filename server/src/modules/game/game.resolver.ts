@@ -11,7 +11,6 @@ import { GameCreateDto, GameVotingDto } from 'src/dto';
 import { Game, GameInfo, User } from 'src/models';
 import { GameService } from './game.service';
 import { AuthGuard } from '../auth/auth.guard';
-import { StorieService } from '../storie/storie.service';
 import { PubSubEngine } from 'graphql-subscriptions';
 import { events } from 'src/enums';
 import { GameStatus } from 'src/models/GameStatus';
@@ -23,7 +22,6 @@ export class GameResolver {
   constructor(
     private readonly gameService: GameService,
     private readonly userService: UserService,
-    private readonly storieService: StorieService,
     @Inject('PUB_SUB') private pubSub: PubSubEngine,
   ) {}
 
@@ -33,12 +31,6 @@ export class GameResolver {
     @Args('data') data: GameCreateDto,
   ): Promise<Game> {
     const newGame = await this.gameService.create(data, userId);
-
-    await Promise.all(
-      data.stories.map((storie) =>
-        this.storieService.create(newGame.id, storie),
-      ),
-    );
 
     return newGame;
   }
