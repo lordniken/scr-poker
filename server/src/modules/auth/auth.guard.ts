@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import * as jwt from 'jsonwebtoken';
+import { UserCredentials } from 'src/models';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -28,7 +29,15 @@ export class AuthGuard implements CanActivate {
     const token = auth.split(' ')[1];
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+      ) as UserCredentials;
+
+      if (!decoded.username) {
+        throw new HttpException('INVALID_TOKEN', HttpStatus.UNAUTHORIZED);
+      }
+
       return decoded;
     } catch (err) {
       throw new HttpException('INVALID_TOKEN', HttpStatus.UNAUTHORIZED);

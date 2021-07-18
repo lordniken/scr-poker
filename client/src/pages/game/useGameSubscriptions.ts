@@ -3,14 +3,19 @@ import { makeReference, useApolloClient, useLazyQuery, useSubscription } from '@
 import { useGameIdSelector } from 'hooks';
 import MeQuery from 'containers/Auth/MeQuery.graphql';
 import GameStatusChangedSubscription from './GameStatusChangedSubscription.graphql';
-import GameUserJoinedSubscription from './GameUserJoinedSubscription.graphql';
-import GameUserDisconnectedSubscription from './GameUserDisconnectedSubscription.graphql';
 import GameInfoQuery from './GameInfoQuery.graphql';
 import GameVotesUpdated from './GameVotesUpdated.graphql';
+import GameUpdateOnlineListSubscription from './GameUpdateOnlineListSubscription.graphql';
 
 const useGameSubscriptions = () => {
   const client = useApolloClient();
   const gameId = useGameIdSelector();
+  const [refreshGameInfo] = useLazyQuery(GameInfoQuery, {
+    variables: {
+      gameId,
+    },
+    fetchPolicy: 'network-only',
+  });
 
   useSubscription(GameStatusChangedSubscription, {
     onSubscriptionData: ({ subscriptionData: { data: { gameStatusChanged: status } } }) => {
@@ -38,78 +43,29 @@ const useGameSubscriptions = () => {
     },
   });
 
-  useSubscription(GameUserJoinedSubscription, {
-    onSubscriptionData: ({ subscriptionData: { data: { userJoined } } }) => {
-      const data = client.readQuery({ 
-        query: GameInfoQuery,
-        variables: {
-          gameId,
-        },
-      });
-  
-      if (!data) {
-        return;
+  useSubscription(GameUpdateOnlineListSubscription, {
+    variables: {
+      gameId,
+    },
+    onSubscriptionData: ({ subscriptionData: { data: { updateOnlineList } } }) => {
+      const { me: { id = null } = {} } = client.readQuery({
+        query: MeQuery,
+      }); 
+      const isMeOnline = updateOnlineList.find((user: {id: string}) => user.id === id);
+      if (!isMeOnline) {
+        refreshGameInfo();
       }
-      
-      const { gameInfo } = data;
-      const isAlreadyOnline = !!gameInfo.onlineList.find((user: any) => user.id === userJoined.id);
-      const newOnlineList = isAlreadyOnline ? gameInfo.onlineList : [
-        ...gameInfo.onlineList, 
-        {
-          id: userJoined.id,
-          username: userJoined.username,
-          __typename: 'User',
-        },
-      ];
 
-      client.writeQuery({
-        query: GameInfoQuery,
-        data: { 
-          gameInfo: {
-            ...gameInfo,
-            onlineList: newOnlineList,
-          },
-        },
-        variables: {
-          gameId,
-        },
-      });
-    },
-  });
-
-  const [refreshGameInfo] = useLazyQuery(GameInfoQuery, {
-    fetchPolicy: 'network-only',
-    variables: {
-      gameId,
-    },
-  });
-
-  useSubscription(GameUserDisconnectedSubscription, {
-    variables: {
-      gameId,
-    },
-    onSubscriptionData: ({ subscriptionData: { data: { userDisconnected } } }) => {
       client.cache.modify({
         id: client.cache.identify(makeReference('ROOT_QUERY')),
         fields: {
-          gameInfo(existing) {
-            const gameInfo = { ...existing, 
-              onlineList: existing.onlineList?.filter((user: any) => user.__ref !== `User:${userDisconnected}`) };
-
-            client.cache.gc();
-    
-            return gameInfo;
+          onlineList() {
+            return updateOnlineList;
           },
         },
         optimistic: true,
       });
-      const { me: { id = null } = {} } = client.readQuery({
-        query: MeQuery,
-      }); 
-
-      if (id === userDisconnected) {
-        refreshGameInfo();
-      }
+      client.cache.gc();
     },
   });
 

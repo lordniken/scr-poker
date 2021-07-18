@@ -3,9 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import { RedisModule } from '@nestjs-modules/ioredis';
-import * as jwt from 'jsonwebtoken';
 import { GlobalRepository } from './GlobalRepository';
-import { deserializeArray, serialize } from 'class-transformer';
 import { events } from 'src/enums';
 
 export const config = ConfigModule.forRoot();
@@ -15,44 +13,11 @@ export const graphql = GraphQLModule.forRoot({
   playground: true,
   installSubscriptionHandlers: true,
   subscriptions: {
-    onDisconnect: async (_, context) => {
-      const redis = GlobalRepository.getRedis();
+    onDisconnect: async (_ws, context) => {
       const { Authorization } = await context.initPromise;
-      const token = Authorization?.split(' ')[1];
+      const [_bearer, token] = Authorization?.split(' ');
 
-      try {
-        const { id } = jwt.verify(token, process.env.JWT_SECRET) as {
-          id: string;
-        };
-
-        redis.keys('online_*', (_, keys) => {
-          keys.forEach(async (key) => {
-            try {
-              const onlineList = deserializeArray(String, await redis.get(key));
-              const isUserFinded = Boolean(
-                onlineList.find((user) => user === id),
-              );
-
-              if (isUserFinded) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const [_, gameId] = key.split('online_');
-
-                await redis.set(
-                  key,
-                  serialize(onlineList.filter((user) => user !== id)),
-                );
-
-                GlobalRepository.getPubSub().publish(events.userDisconnected, {
-                  userDisconnected: {
-                    id,
-                    gameId,
-                  },
-                });
-              }
-            } catch {}
-          });
-        });
-      } catch {}
+      GlobalRepository.getPubSub().publish(events.userDisconnected, token);
     },
   },
   autoSchemaFile: 'schema.gql',

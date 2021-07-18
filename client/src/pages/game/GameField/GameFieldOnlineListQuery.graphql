@@ -1,0 +1,6 @@
+query GameFieldOnlineListQuery($gameId: String!){
+  onlineList(gameId: $gameId){
+    id
+    username
+  }
+}
