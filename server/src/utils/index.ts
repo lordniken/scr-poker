@@ -14,10 +14,12 @@ export const graphql = GraphQLModule.forRoot({
   installSubscriptionHandlers: true,
   subscriptions: {
     onDisconnect: async (_ws, context) => {
-      const { Authorization } = await context.initPromise;
-      const [_bearer, token] = Authorization?.split(' ');
+      try {
+        const { Authorization } = await context.initPromise;
+        const [_bearer, token] = Authorization?.split(' ');
 
-      GlobalRepository.getPubSub().publish(events.userDisconnected, token);
+        GlobalRepository.getPubSub().publish(events.userDisconnected, token);
+      } catch {}
     },
   },
   autoSchemaFile: 'schema.gql',
