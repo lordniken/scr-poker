@@ -7,6 +7,7 @@ import { UserCredentials } from 'src/models';
 import { sortByKey } from 'src/utils/sort';
 import { AuthService } from '../auth/auth.service';
 
+const USER_RECONNECT_TIMEOUT = 2000;
 @Injectable()
 export class OnlineService {
   constructor(
@@ -49,13 +50,15 @@ export class OnlineService {
     await this.redis.set(`online_${gameId}`, serialize(newOnlineList));
   }
 
-  async removeUser(gameId: string, userId: string): Promise<void> {
+  async removeUser(gameId: string, userId: string): Promise<UserCredentials[]> {
     const currentOnlineList = await this.getOnlineList(gameId);
     const filteredOnlineList = currentOnlineList.filter(
       (user) => user.id !== userId,
     );
 
     await this.redis.set(`online_${gameId}`, serialize(filteredOnlineList));
+
+    return filteredOnlineList;
   }
 
   async findGameIdsByUserId(userId: string): Promise<string[]> {
@@ -94,13 +97,20 @@ export class OnlineService {
     const gameIds = await this.findGameIdsByUserId(user?.id);
 
     gameIds?.forEach(async (gameId) => {
-      await this.removeUser(gameId, user.id);
+      const onlineListPrev = await this.removeUser(gameId, user.id);
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, USER_RECONNECT_TIMEOUT),
+      );
+
       const onlineList = await this.getOnlineList(gameId);
 
-      this.pubSub.publish(events.updateOnlineList, {
-        gameId,
-        onlineList,
-      });
+      if (!Object.is(onlineList, onlineListPrev)) {
+        this.pubSub.publish(events.updateOnlineList, {
+          gameId,
+          onlineList,
+        });
+      }
     });
   }
 }
