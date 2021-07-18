@@ -1,11 +1,13 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
+import { useQuery } from '@apollo/client';
 import { FlexBox, Card } from 'components';
+import { useGameIdSelector } from 'hooks';
+import GameFieldOnlineListQuery from './GameFieldOnlineListQuery.graphql';
 import { gameFieldStyles } from './styles';
 
 interface IProps {
   title: string;
-  onlineList: IUser[];
   votedUsers: IVote[];
 }
 
@@ -19,8 +21,14 @@ export interface IVote {
   value: string;
 }
 
-const GameField: React.FC<IProps> = ({ children, title, onlineList = [], votedUsers = [] }) => {
+const GameField: React.FC<IProps> = ({ children, title, votedUsers = [] }) => {
   const styles = gameFieldStyles();
+  const gameId = useGameIdSelector();
+  const { data: { onlineList = [] } = {} } = useQuery(GameFieldOnlineListQuery, {
+    variables: {
+      gameId,
+    },
+  });
 
   return (
     <FlexBox 
@@ -40,7 +48,7 @@ const GameField: React.FC<IProps> = ({ children, title, onlineList = [], votedUs
         {children}
       </FlexBox>
       
-      {onlineList.map((user: IUser, index) => {
+      {onlineList.map((user: IUser, index: number) => {
         const votedUser = votedUsers?.find(vote => vote.userId === user.id);
 
         return (

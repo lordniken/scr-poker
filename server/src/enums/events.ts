@@ -1,7 +1,7 @@
 enum events {
   gameStatusChanged = 'gameStatusChanged',
-  userJoined = 'userJoined',
   userDisconnected = 'userDisconnected',
+  updateOnlineList = 'updateOnlineList',
   updateUserVotes = 'updateUserVotes',
 }
 

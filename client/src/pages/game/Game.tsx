@@ -34,22 +34,12 @@ const Game: React.FC = () => {
     } = {}, 
     cards, 
     votedScore,
-    onlineList = [],
   } = gameInfo;
   const activeStorieTitle = React.useMemo(() => {
     const activeStorie = (stories as IStorie[]).find(storie => storie.id === votingStorieId);
 
     return activeStorie ? activeStorie.storieName : 'Waiting for the start...';
   }, [JSON.stringify(stories), votingStorieId]);  
-  const sortedOnlineList = React.useMemo(() => [...onlineList].sort((a, b) => {
-    if ( a.username < b.username ){
-      return -1;
-    }
-    if ( a.username > b.username ){
-      return 1;
-    }
-    return 0;
-  }), [JSON.stringify(onlineList)]);
 
   if (loading) {
     return null;
@@ -64,7 +54,7 @@ const Game: React.FC = () => {
         marginBottom={10}
         width='100%'
       >
-        <GameField title={activeStorieTitle} onlineList={sortedOnlineList} votedUsers={votedUsers}>
+        <GameField title={activeStorieTitle} votedUsers={votedUsers}>
           <GameControls 
             cards={cards} 
             isVotingStarted={isVotingStarted} 

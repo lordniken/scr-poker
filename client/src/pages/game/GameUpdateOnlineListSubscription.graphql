@@ -1,0 +1,6 @@
+subscription GameUpdateOnlineListSubscription($gameId: String!){
+  updateOnlineList(gameId: $gameId){
+    id
+    username
+  }
+}

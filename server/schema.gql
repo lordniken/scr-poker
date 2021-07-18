@@ -51,7 +51,6 @@ type GameInfo {
   ownerId: String!
   isGameOwner: Boolean!
   votedScore: String
-  onlineList: [User!]
 }
 
 type Storie {
@@ -63,11 +62,17 @@ type Storie {
   votes: [Vote!]
 }
 
+type UserCredentials {
+  id: ID!
+  username: String!
+}
+
 type Query {
   auth(data: UserAuthDto!): String!
   me: User!
   gameInfo(gameId: String!): GameInfo!
   stories(gameId: String!): [Storie!]!
+  onlineList(gameId: String!): [UserCredentials!]!
 }
 
 input UserAuthDto {
@@ -109,7 +114,6 @@ input UserRegistrationDto {
 
 type Subscription {
   gameStatusChanged: GameStatus!
-  userJoined: User!
-  userDisconnected(gameId: String!): String!
   updateUserVotes: [Vote!]!
+  updateOnlineList(gameId: String!): [UserCredentials!]!
 }

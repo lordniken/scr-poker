@@ -1,36 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { deserializeArray, plainToClass, serialize } from 'class-transformer';
+import { plainToClass } from 'class-transformer';
+import { PubSubEngine } from 'graphql-subscriptions';
+import { events } from 'src/enums';
 import { GameEntity } from 'src/entities';
 import { GameCreateDto } from 'src/dto';
-import { Game, GameInfo, User, Vote } from 'src/models';
+import { Game, GameInfo, User, UserCredentials, Vote } from 'src/models';
 import { GameStatus } from 'src/models/GameStatus';
-import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { UserService } from '../user/user.service';
-import { StorieService } from '../storie/storie.service';
 import { replaceValues } from 'src/utils/filters';
+import { StorieService } from '../storie/storie.service';
+import { OnlineService } from '../online/online.service';
 
 @Injectable()
 export class GameService {
   constructor(
-    @InjectRedis()
-    private readonly redis: Redis,
+    @Inject('PUB_SUB') private pubSub: PubSubEngine,
     @InjectRepository(GameEntity)
     private gamesRepository: Repository<GameEntity>,
-    private readonly userService: UserService,
     private readonly storieService: StorieService,
+    private readonly onlineService: OnlineService,
   ) {}
 
-  async create(data: GameCreateDto, ownerId: string): Promise<Game> {
+  async create(data: GameCreateDto, user: UserCredentials): Promise<Game> {
     const newGameQuery = await this.gamesRepository.create({
       ...data,
-      ownerId,
+      ownerId: user.id,
     });
     const newGame = await this.gamesRepository.save(newGameQuery);
 
     await this.storieService.createStories(newGame.id, data.stories);
-    await this.updateOnlineList(newGame.id, ownerId);
 
     return plainToClass(Game, newGame, {
       excludeExtraneousValues: true,
@@ -84,53 +83,31 @@ export class GameService {
     });
   }
 
-  async getGameInfo(gameId: string, userId: string): Promise<GameInfo> {
+  async getGameInfo(gameId: string, user: User): Promise<GameInfo> {
     const game = await this.findGameById(gameId);
-    const isGameOwner = userId === game.ownerId;
+    const isGameOwner = user.id === game.ownerId;
     const userVote = await this.storieService.findVoteByUserId(
       gameId,
       game.status.votingStorieId,
-      userId,
+      user.id,
     );
     const votedScore = userVote?.value;
-
-    const onlineUsers = await this.updateOnlineList(gameId, userId);
-    const onlineList = onlineUsers?.map(({ id, username }) => ({
-      id,
-      username,
-    }));
     const gameStatus = await this.getGameStatus(game);
+
+    await this.onlineService.update(gameId, user);
+    const onlineList = this.onlineService.getOnlineList(gameId);
+
+    this.pubSub.publish(events.updateOnlineList, {
+      gameId,
+      onlineList,
+    });
 
     return plainToClass(GameInfo, {
       ...game,
       ...gameStatus,
       votedScore,
-      onlineList,
       isGameOwner,
     });
-  }
-
-  async updateOnlineList(gameId: string, userId: string): Promise<User[]> {
-    const redisKey = `online_${gameId}`;
-    const redisOnlineList = await this.redis.get(redisKey);
-
-    if (!redisOnlineList) {
-      await this.redis.set(redisKey, serialize([userId]));
-      return;
-    }
-
-    const onlineList = deserializeArray(String, redisOnlineList);
-    const newOnlineList = new Set([...onlineList, userId]);
-
-    await this.redis.set(redisKey, serialize(newOnlineList));
-
-    const userList = await Promise.all(
-      [...newOnlineList].map((user: string) =>
-        this.userService.findUserById(user),
-      ),
-    );
-
-    return userList;
   }
 
   async changeGameStatus(gameId, storieId, userId): Promise<GameStatus> {

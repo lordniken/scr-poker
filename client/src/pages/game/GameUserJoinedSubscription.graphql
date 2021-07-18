@@ -1,6 +1,0 @@
-subscription GameUserJoinedSubscription{
-  userJoined{
-    id
-    username
-  }
-}
