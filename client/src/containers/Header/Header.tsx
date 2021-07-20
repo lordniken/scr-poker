@@ -38,13 +38,13 @@ const Header: React.FC = () => {
   }, [pathname, gameId, gameInfoQuery?.gameInfo?.gameName]);
   
   return (
-    <AppBar position="static">
+    <AppBar position="static" className={styles.header}>
       <Toolbar>
         <Typography variant="h6" className={styles.title}>
           {title}
         </Typography>
         <FlexBox alignItems="center">
-          <Typography>{username}</Typography>
+          <Typography className={styles.username}>{username}</Typography>
           <IconButton
             aria-label="account of current user"
             aria-controls="menu-appbar"
