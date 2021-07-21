@@ -23,14 +23,14 @@ const useGameSubscriptions = () => {
         id: client.cache.identify(makeReference('ROOT_QUERY')),
         fields: {
           gameInfo(existing) {
-            const gameInfo = { ...existing, status };
+            const votedScore = status.isVotingStarted ? existing.votedScore : null;
+            const gameInfo = { ...existing, votedScore, status };
 
             return gameInfo;
           },
         },
         optimistic: true,
       });
-
       client.cache.modify({
         id: `Storie:${status.votingStorieId}`,
         fields: {
@@ -52,6 +52,7 @@ const useGameSubscriptions = () => {
         query: MeQuery,
       }); 
       const isMeOnline = updateOnlineList.find((user: {id: string}) => user.id === id);
+
       if (!isMeOnline) {
         refreshGameInfo();
       }
