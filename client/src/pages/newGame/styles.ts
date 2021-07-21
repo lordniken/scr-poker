@@ -4,7 +4,7 @@ export const newGameStyles = makeStyles((theme) => ({
   container: {
     backgroundColor: theme.palette.background.paper,
     borderRadius: theme.spacing(1),
-    padding: theme.spacing(6),
+    padding: theme.spacing(4, 6),
     border: `1px solid ${theme.palette.grey[300]}`,
   },
   list: {
@@ -14,6 +14,6 @@ export const newGameStyles = makeStyles((theme) => ({
   },
   listItems: {
     overflowY: 'auto',
-    height: 150,
+    height: 200,
   },
 }));

@@ -3,8 +3,8 @@ import { useQuery } from '@apollo/client';
 import { Typography } from '@material-ui/core';
 import { useGameIdSelector } from 'hooks';
 import { FlexBox, Card } from 'components';
-import GameFieldOnlineListQuery from './GameFieldOnlineListQuery.graphql';
 import { gameFieldOnlineListStyles } from './styles';
+import GameFieldOnlineListQuery from './GameFieldOnlineListQuery.graphql';
 
 interface IProps {
   votedUsers: IVote[];
