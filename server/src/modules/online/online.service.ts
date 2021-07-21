@@ -94,7 +94,12 @@ export class OnlineService {
 
   async userDisonnected(token: string): Promise<void> {
     const user = this.authService.parseToken(token);
-    const gameIds = await this.findGameIdsByUserId(user?.id);
+
+    if (!user) {
+      return;
+    }
+
+    const gameIds = await this.findGameIdsByUserId(user.id);
 
     gameIds?.forEach(async (gameId) => {
       const onlineListPrev = await this.removeUser(gameId, user.id);

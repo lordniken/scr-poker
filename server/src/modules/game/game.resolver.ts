@@ -55,14 +55,18 @@ export class GameResolver {
     );
 
     this.pubSub.publish(events.gameStatusChanged, {
-      gameStatusChanged: result,
+      gameStatusChanged: { ...result, gameId },
     });
 
     return true;
   }
 
-  @Subscription(() => GameStatus)
-  gameStatusChanged() {
+  @Subscription(() => GameStatus, {
+    filter: ({ gameStatusChanged }, { gameId }) => {
+      return gameStatusChanged.gameId === gameId;
+    },
+  })
+  gameStatusChanged(@Args('gameId') _gameId: string) {
     return this.pubSub.asyncIterator(events.gameStatusChanged);
   }
 }
