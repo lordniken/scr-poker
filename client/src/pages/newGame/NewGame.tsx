@@ -20,12 +20,13 @@ import {
 import { TextField, Select, CheckBox } from 'components';
 import { yupResolver } from '@hookform/resolvers/yup';
 import RemoveIcon from '@material-ui/icons/RemoveCircle';
+import AddCircle from '@material-ui/icons/AddCircle';
 import { useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
-import NewGameMutation from './NewGameMutation.graphql';
 import { newGameStyles } from './styles';
 import { newGameValidationSchema } from './validation';
 import { DashboardStruct } from '../dashboard';
+import NewGameMutation from './NewGameMutation.graphql';
 
 interface IStorie {
   id: string;
@@ -57,7 +58,7 @@ const NewGame: React.FC = () => {
     resolver: yupResolver(newGameValidationSchema),
   });
   const handleUsAdd = React.useCallback((e) => {
-    if (e.keyCode === 13) {
+    if ((e.type === 'keydown' && e.keyCode === 13) || e.type === 'click') {
       e.preventDefault();
       if (!storieRef!.current!.value.trim()) {
         return;
@@ -71,7 +72,7 @@ const NewGame: React.FC = () => {
   const handleUsRemove = React.useCallback(id => {
     setStory(stories.filter(us => us.id !== id));
   }, [stories]);
-  const [createGame] = useMutation(NewGameMutation, {
+  const [createGame, { loading: createGameLoading }] = useMutation(NewGameMutation, {
     onCompleted: ({ createGame: { id } }) => {
       history.push(`/game/${id}`);
     },
@@ -99,7 +100,7 @@ const NewGame: React.FC = () => {
             name="votingSystem"
             control={control}
           >
-            <MenuItem value="fibonacci">Fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
+            <MenuItem value="fibonacci">Almost fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
             <MenuItem value="x2">x2 (0, 1, 2, 4, 8, 16, 32, 64, ?)</MenuItem>
           </Select>
         </FormControl>
@@ -133,6 +134,11 @@ const NewGame: React.FC = () => {
                 fullWidth 
                 onKeyDown={handleUsAdd} 
                 inputRef={storieRef}
+                InputProps={{ endAdornment: (
+                  <IconButton size="small" onClick={handleUsAdd} edge="end">
+                    <AddCircle fontSize="small" />
+                  </IconButton>),
+                }}
               />
             </ListItem>
           </List>
@@ -141,7 +147,7 @@ const NewGame: React.FC = () => {
           variant="contained" 
           color="primary" 
           type="submit"
-          disabled={!isValid}
+          disabled={!isValid || createGameLoading}
           fullWidth
         >
           Start game
