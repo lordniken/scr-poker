@@ -100,7 +100,7 @@ const NewGame: React.FC = () => {
             name="votingSystem"
             control={control}
           >
-            <MenuItem value="fibonacci">Almost fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
+            <MenuItem value="fibonacci">Almost Fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
             <MenuItem value="x2">x2 (0, 1, 2, 4, 8, 16, 32, 64, ?)</MenuItem>
           </Select>
         </FormControl>
