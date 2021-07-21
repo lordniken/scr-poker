@@ -2,11 +2,11 @@ import { makeStyles } from '@material-ui/core';
 import { IProps } from './types';
 
 export const verticalProgressStyles = makeStyles((theme) => ({
-  root: (props: IProps) => ({
+  root: ({ highlighted, progress }: IProps) => ({
     width: 8,
     height: 80,
-    backgroundColor: theme.palette.background.paper,
-    border: `1px solid ${theme.palette.grey[300]}`,
+    backgroundColor: theme.palette.common.white,
+    border: `1px solid ${theme.palette.divider}`,
     borderRadius: theme.spacing(1),
     position: 'relative',
     boxSizing: 'initial',
@@ -14,12 +14,12 @@ export const verticalProgressStyles = makeStyles((theme) => ({
       content: '""',
       position: 'absolute',
       width: 6,
-      height: `${props.progress}%`,
+      height: `${progress}%`,
       bottom: 0,
       backgroundColor: theme.palette.primary.main,
       borderRadius: theme.spacing(1),
       margin: 1,
-      opacity: props.highlighted ? 1 : .3,
+      opacity: highlighted ? 1 : .3,
     },
   }),
 }));

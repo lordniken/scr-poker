@@ -62,8 +62,12 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingS
   }, [currentVotingStorie]);
 
   return (
-    <FlexBox flexDirection="column" alignItems="center">
-      <Typography>Stories list</Typography>
+    <FlexBox 
+      flexDirection="column" 
+      alignItems="center"
+      className={styles.root}
+    >
+      <Typography variant="subtitle2">Stories list</Typography>
       <Container 
         maxWidth="sm" 
         component="form" 

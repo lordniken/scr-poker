@@ -9,8 +9,6 @@ import GameStories from './GameStories';
 import GameField from './GameField';
 import { IStorie } from './GameStories/GameStories';
 import useGameSubscriptions from './useGameSubscriptions';
-import GameControls from './GameControls';
-import GameResults from './GameResults';
 
 const Game: React.FC = () => {
   useGameSubscriptions();
@@ -20,57 +18,33 @@ const Game: React.FC = () => {
       gameId,
     },
   });
-  const { data : { stories = [] } = {} } = useQuery(GameStoriesQuery, {
+  const { data : { stories = [] } = {}, loading: storiesLoading } = useQuery(GameStoriesQuery, {
     variables: {
       gameId,
     },
   });
-  const { 
-    isGameOwner, 
-    status: { 
-      votingStorieId = null, 
-      isVotingStarted = false, 
-      votedUsers = [],
-    } = {}, 
-    cards, 
-    votedScore,
-  } = gameInfo;
+  const { isGameOwner, status: { votingStorieId = null, isVotingStarted = false } = {} } = gameInfo;
   const activeStorieTitle = React.useMemo(() => {
     const activeStorie = (stories as IStorie[]).find(storie => storie.id === votingStorieId);
 
-    return activeStorie ? activeStorie.storieName : 'Waiting for the start...';
+    return activeStorie ? activeStorie.storieName : 'Waiting for the start..';
   }, [JSON.stringify(stories), votingStorieId]);  
 
-  if (loading) {
+  if (loading || storiesLoading) {
     return null;
   }
 
   return (
-    <FlexBox flexDirection="column" alignItems="center">
+    <FlexBox flexDirection="column" alignItems="center" height="100vh">
       <Header />
-      <FlexBox 
-        padding={2} 
-        justifyContent="space-beetween" 
-        marginBottom={10}
-        width='100%'
-      >
-        <GameField title={activeStorieTitle} votedUsers={votedUsers}>
-          <GameControls 
-            cards={cards} 
-            isVotingStarted={isVotingStarted} 
-            storieId={votingStorieId}
-            votedCard={votedScore}
-          />
-        </GameField>
-        <FlexBox flexDirection="column" width={500}>
-          <GameStories 
-            isGameOwner={isGameOwner} 
-            currentVotingStorie={votingStorieId} 
-            isVotingStarted={isVotingStarted}
-          />
-        </FlexBox>
+      <FlexBox width="100%" height="100%">
+        <GameField title={activeStorieTitle} />  
+        <GameStories 
+          isGameOwner={isGameOwner} 
+          currentVotingStorie={votingStorieId} 
+          isVotingStarted={isVotingStarted}
+        />
       </FlexBox>
-      <GameResults votedUsers={votedUsers} isVotingStarted={isVotingStarted} />
     </FlexBox>
   );
 };
