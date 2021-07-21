@@ -14,7 +14,15 @@ export default createMuiTheme({
   },
   palette: {
     background: {
-      default: '#efeeea',
+      default: '#EFEFEF',
+      paper: '#F7F7F7',
+    },
+    primary: {
+      main: '#6186BC',
+      dark: '#5F789D',
+    },
+    secondary: {
+      main: '#BC6161',
     },
   },
 });

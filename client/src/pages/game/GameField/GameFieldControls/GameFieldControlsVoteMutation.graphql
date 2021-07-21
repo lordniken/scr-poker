@@ -1,0 +1,3 @@
+mutation GameFieldControlsVoteMutation($data: StorieVotingDto!){
+  vote(data: $data)
+}

@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core';
 const useGlobalStyles = makeStyles(theme => ({
   '@global': {
     '*': {
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
     },
     'html, body, #root': {
       width: '100vw',

@@ -17,16 +17,9 @@ interface IProps {
   isVotingStarted: boolean;
 }
 
-enum StorieStatus {
-  unvoted = 'unvoted',
-  voting = 'voting',
-  voted = 'voted',
-}
-
 export interface IStorie {
   id: string;
   storieName: string;
-  status: StorieStatus;
   isVoted: boolean;
 }
 
@@ -69,8 +62,12 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingS
   }, [currentVotingStorie]);
 
   return (
-    <FlexBox flexDirection="column" alignItems="center">
-      <Typography>Stories list</Typography>
+    <FlexBox 
+      flexDirection="column" 
+      alignItems="center"
+      className={styles.root}
+    >
+      <Typography variant="subtitle2">Stories list</Typography>
       <Container 
         maxWidth="sm" 
         component="form" 
@@ -86,7 +83,14 @@ const Stories: React.FC<IProps> = ({ isGameOwner, currentVotingStorie, isVotingS
                 selected={isVotingStarted ? storie.id === currentVotingStorie : selectedStorie === storie.id}
                 disabled={isVotingStarted && isGameOwner}
               >
-                <Typography className={cn({ [styles.completedStory]: storie.isVoted })}>{storie.storieName}</Typography>
+                <Typography 
+                  variant="body2"
+                  className={
+                    cn({ [styles.completedStory]: storie.isVoted })
+                  }
+                >
+                  {storie.storieName}
+                </Typography>
               </ListItem>,
             )
           }

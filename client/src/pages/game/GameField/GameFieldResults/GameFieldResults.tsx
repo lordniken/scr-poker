@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@material-ui/core';
 import { Card, FlexBox } from 'components';
 import VerticalProgress from 'components/VerticalProgress';
-import { IVote } from '../GameField/GameField';
+import { IVote } from '../GameFieldOnlineList';
 
 interface IProps {
   votedUsers: IVote[];
@@ -26,7 +26,7 @@ const getAverageScore = (storieVotes: IVote[]) => {
   return Math.floor(votesSum / votes.length * 100) / 100 || 0;
 };
 
-const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
+const GameFieldResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
   const [averageScore, setAverageScore] = React.useState<number>(0);
   const [valueStats, setValueStats] = React.useState<IResultVote[]>([]);
 
@@ -68,7 +68,7 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
   }
 
   return (
-    <>
+    <FlexBox alignItems="center" flexDirection="column">
       <Box>
         <Typography display="inline">Average score:&nbsp;</Typography>
         <Typography display="inline" variant="h6">{averageScore}</Typography>
@@ -98,8 +98,8 @@ const GameResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
           )
         }
       </FlexBox>
-    </>
+    </FlexBox>
   );
 };
 
-export default GameResults;
+export default GameFieldResults;

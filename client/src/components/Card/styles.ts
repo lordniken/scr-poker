@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { fade, makeStyles } from '@material-ui/core';
 
 export const cardStyles = makeStyles((theme) => ({
   card: {
@@ -18,5 +18,7 @@ export const cardStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.light + ' !important',
     borderColor: theme.palette.primary.light + ' !important',
     color: theme.palette.primary.contrastText + ' !important',
+    boxShadow: `2px 2px 0px ${fade(theme.palette.primary.dark, 0.8)}`,
+    textShadow: `2px 2px 0px ${theme.palette.primary.dark}`,
   },
 }));
