@@ -1,5 +1,5 @@
-subscription GameStatusChangedSubscription{
-  gameStatusChanged{
+subscription GameStatusChangedSubscription($gameId: String!){
+  gameStatusChanged(gameId: $gameId){
     isVotingStarted
     votingStorieId
     votedUsers{

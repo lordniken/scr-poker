@@ -42,17 +42,27 @@ export class StorieResolver {
     );
 
     this.pubSub.publish(events.updateUserVotes, {
-      updateUserVotes: votedUserList.map(({ userId }) => ({
-        userId,
-        value: null,
-      })),
+      updateUserVotes: {
+        votes: votedUserList.map(({ userId }) => ({
+          userId,
+          value: null,
+        })),
+        gameId: data.gameId,
+      },
     });
 
     return true;
   }
 
-  @Subscription(() => [Vote])
-  updateUserVotes() {
+  @Subscription(() => [Vote], {
+    filter: ({ updateUserVotes }, { gameId }) => {
+      return updateUserVotes.gameId === gameId;
+    },
+    resolve: ({ updateUserVotes }) => {
+      return updateUserVotes.votes;
+    },
+  })
+  updateUserVotes(@Args('gameId') _gameId: string) {
     return this.pubSub.asyncIterator(events.updateUserVotes);
   }
 }

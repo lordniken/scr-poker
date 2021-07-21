@@ -18,6 +18,9 @@ const useGameSubscriptions = () => {
   });
 
   useSubscription(GameStatusChangedSubscription, {
+    variables: {
+      gameId,
+    },
     onSubscriptionData: ({ subscriptionData: { data: { gameStatusChanged: status } } }) => {
       client.cache.modify({
         id: client.cache.identify(makeReference('ROOT_QUERY')),
@@ -71,6 +74,9 @@ const useGameSubscriptions = () => {
   });
 
   useSubscription(GameVotesUpdated, {
+    variables: {
+      gameId,
+    },
     onSubscriptionData: ({ subscriptionData: { data: { updateUserVotes } } }) => {
       client.cache.modify({
         id: client.cache.identify(makeReference('ROOT_QUERY')),

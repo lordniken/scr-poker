@@ -1,5 +1,5 @@
-subscription GameVotesUpdated{
-  updateUserVotes{
+subscription GameVotesUpdated($gameId: String!){
+  updateUserVotes(gameId: $gameId){
     userId
     value
   }

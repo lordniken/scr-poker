@@ -73,7 +73,6 @@ type Query {
   gameInfo(gameId: String!): GameInfo!
   stories(gameId: String!): [Storie!]!
   onlineList(gameId: String!): [UserCredentials!]!
-  votes(gameId: String!): [Vote!]!
 }
 
 input UserAuthDto {
@@ -114,7 +113,7 @@ input UserRegistrationDto {
 }
 
 type Subscription {
-  gameStatusChanged: GameStatus!
-  updateUserVotes: [Vote!]!
+  gameStatusChanged(gameId: String!): GameStatus!
+  updateUserVotes(gameId: String!): [Vote!]!
   updateOnlineList(gameId: String!): [UserCredentials!]!
 }
