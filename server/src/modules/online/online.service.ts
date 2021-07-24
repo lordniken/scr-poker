@@ -56,9 +56,15 @@ export class OnlineService {
       (user) => user.id !== userId,
     );
 
-    await this.redis.set(`online_${gameId}`, serialize(filteredOnlineList));
+    if (filteredOnlineList.length) {
+      await this.redis.set(`online_${gameId}`, serialize(filteredOnlineList));
 
-    return filteredOnlineList;
+      return filteredOnlineList;
+    }
+
+    await this.redis.del(`online_${gameId}`);
+
+    return;
   }
 
   async findGameIdsByUserId(userId: string): Promise<string[]> {
