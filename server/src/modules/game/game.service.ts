@@ -94,8 +94,8 @@ export class GameService {
     const votedScore = userVote?.value;
     const gameStatus = await this.getGameStatus(game);
 
-    await this.onlineService.update(gameId, user);
-    const onlineList = this.onlineService.getOnlineList(gameId);
+    await this.onlineService.addUser(gameId, user);
+    const onlineList = await this.onlineService.getOnlineList(gameId);
 
     this.pubSub.publish(events.updateOnlineList, {
       gameId,

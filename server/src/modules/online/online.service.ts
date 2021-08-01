@@ -1,6 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { Inject, Injectable } from '@nestjs/common';
-import { deserializeArray, serialize } from 'class-transformer';
 import { PubSubEngine } from 'graphql-subscriptions';
 import { events } from 'src/enums';
 import { UserCredentials } from 'src/models';
@@ -23,48 +22,47 @@ export class OnlineService {
     );
   }
 
-  async getOnlineList(gameId: string): Promise<UserCredentials[]> {
-    const redisOnlineList = await this.redis.get(`online_${gameId}`);
-    const currentOnlineList = deserializeArray(
-      UserCredentials,
-      redisOnlineList,
-    );
+  async getOnlineListAsMap(gameId: string): Promise<Map<string, string>> {
+    const redisOnlineList = await this.redis.hgetall(`online_${gameId}`);
 
-    return currentOnlineList ?? [];
+    return new Map(Object.entries(redisOnlineList));
   }
 
-  async update(gameId: string, user: UserCredentials): Promise<void> {
-    const currentOnlineList = await this.getOnlineList(gameId);
-    const isUserAlreadyOnline = Boolean(
-      currentOnlineList.find((u) => u.id === user.id),
+  async getOnlineList(gameId: string): Promise<UserCredentials[]> {
+    const onlineList = await this.getOnlineListAsMap(gameId);
+    const normalizedOnlineList = Array.from(onlineList.entries()).map(
+      ([id, username]) => ({
+        id,
+        username,
+      }),
     );
 
-    if (isUserAlreadyOnline) {
+    return normalizedOnlineList.sort(sortByKey('username'));
+  }
+
+  async addUser(gameId: string, user: UserCredentials): Promise<void> {
+    const currentOnlineList = await this.getOnlineListAsMap(gameId);
+
+    if (currentOnlineList.has(user.id)) {
       return;
     }
 
-    const newOnlineList = [...currentOnlineList, user].sort(
-      sortByKey('username'),
-    );
-
-    await this.redis.set(`online_${gameId}`, serialize(newOnlineList));
+    currentOnlineList.set(user.id, user.username);
+    await this.redis.hset(`online_${gameId}`, currentOnlineList);
   }
 
-  async removeUser(gameId: string, userId: string): Promise<UserCredentials[]> {
-    const currentOnlineList = await this.getOnlineList(gameId);
-    const filteredOnlineList = currentOnlineList.filter(
-      (user) => user.id !== userId,
-    );
+  async removeUser(gameId: string, userId: string): Promise<void> {
+    const currentOnlineList = await this.getOnlineListAsMap(gameId);
 
-    if (filteredOnlineList.length) {
-      await this.redis.set(`online_${gameId}`, serialize(filteredOnlineList));
+    currentOnlineList.delete(userId);
 
-      return filteredOnlineList;
+    if (currentOnlineList.size) {
+      await this.redis.hdel(`online_${gameId}`, userId);
+
+      return;
     }
 
     await this.redis.del(`online_${gameId}`);
-
-    return;
   }
 
   async findGameIdsByUserId(userId: string): Promise<string[]> {
@@ -73,21 +71,12 @@ export class OnlineService {
       await Promise.all(
         onlineList.map((key) => {
           return new Promise(async (resolve) => {
-            try {
-              const onlineList = deserializeArray(
-                UserCredentials,
-                await this.redis.get(key),
-              );
-              const isUserFinded = Boolean(
-                onlineList.find((user) => user.id === userId),
-              );
+            const [_, gameId] = key.split('online_');
+            const onlineList = await this.getOnlineListAsMap(gameId);
 
-              if (isUserFinded) {
-                const [_, gameId] = key.split('online_');
-
-                resolve(gameId);
-              }
-            } catch {}
+            if (onlineList.has(userId)) {
+              resolve(gameId);
+            }
 
             resolve(null);
           });
@@ -108,15 +97,15 @@ export class OnlineService {
     const gameIds = await this.findGameIdsByUserId(user.id);
 
     gameIds?.forEach(async (gameId) => {
-      const onlineListPrev = await this.removeUser(gameId, user.id);
+      await this.removeUser(gameId, user.id);
+      const onlineListPrev = await this.getOnlineList(gameId);
 
       await new Promise((resolve) =>
         setTimeout(resolve, USER_RECONNECT_TIMEOUT),
       );
-
       const onlineList = await this.getOnlineList(gameId);
 
-      if (!Object.is(onlineList, onlineListPrev)) {
+      if (JSON.stringify(onlineList) === JSON.stringify(onlineListPrev)) {
         this.pubSub.publish(events.updateOnlineList, {
           gameId,
           onlineList,

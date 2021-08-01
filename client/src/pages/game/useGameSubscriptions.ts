@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { makeReference, useApolloClient, useLazyQuery, useSubscription } from '@apollo/client';
+import { debounce } from 'lodash-es';
 import { useGameIdSelector } from 'hooks';
 import MeQuery from 'containers/Auth/MeQuery.graphql';
 import GameStatusChangedSubscription from './GameStatusChangedSubscription.graphql';
@@ -57,7 +58,7 @@ const useGameSubscriptions = () => {
       const isMeOnline = updateOnlineList.find((user: {id: string}) => user.id === id);
 
       if (!isMeOnline) {
-        refreshGameInfo();
+        debounce(refreshGameInfo, 1000)();
       }
 
       client.cache.modify({
