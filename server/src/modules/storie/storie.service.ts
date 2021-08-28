@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { PubSubEngine } from 'graphql-subscriptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StorieEntity } from 'src/entities';
@@ -6,10 +7,12 @@ import { Storie, Vote } from 'src/models';
 import { StorieVotingDto } from 'src/dto';
 import { classToPlain, deserializeArray, serialize } from 'class-transformer';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { events } from 'src/enums';
 
 @Injectable()
 export class StorieService {
   constructor(
+    @Inject('PUB_SUB') private pubSub: PubSubEngine,
     @InjectRedis()
     private readonly redis: Redis,
     @InjectRepository(StorieEntity)
@@ -48,8 +51,8 @@ export class StorieService {
     return await this.storieRepository.findOne({ id });
   }
 
-  async findVoteByUserId(gameId: string, id: string, userId): Promise<Vote> {
-    const redisVotes = await this.redis.get(`votes_${gameId}_${id}`);
+  async findUserVote(gameId: string, storieId: string, userId): Promise<Vote> {
+    const redisVotes = await this.redis.get(`votes_${gameId}_${storieId}`);
     const votes = deserializeArray(Vote, redisVotes);
 
     return votes?.find((vote) => vote.userId === userId) ?? null;
@@ -61,6 +64,16 @@ export class StorieService {
 
     const votes = deserializeArray(Vote, redisVotes) ?? storie?.votes;
     return votes;
+  }
+
+  async resetStorieVotes(storieId: string): Promise<void> {
+    const storie = await this.findOneById(storieId);
+
+    await this.storieRepository.save({
+      ...storie,
+      isVoted: false,
+      votes: null,
+    });
   }
 
   updateVotes(userId: string, value: string, votes: Vote[]) {
@@ -115,11 +128,29 @@ export class StorieService {
     { gameId, storieId, value }: StorieVotingDto,
     userId: string,
   ): Promise<void> {
+    const { isVoted } = await this.findOneById(storieId);
+
+    if (isVoted) {
+      return;
+    }
+
     const redisKey = `votes_${gameId}_${storieId}`;
     const redisVotes = await this.redis.get(redisKey);
     const votes = deserializeArray(Vote, redisVotes);
     const newVotes = this.updateVotes(userId, value, votes);
 
     await this.redis.set(redisKey, serialize(newVotes));
+
+    const votedUserList = await this.findVotesByGameId(gameId, storieId);
+
+    this.pubSub.publish(events.updateUserVotes, {
+      updateUserVotes: {
+        votes: votedUserList.map(({ userId }) => ({
+          userId,
+          value: null,
+        })),
+        gameId,
+      },
+    });
   }
 }

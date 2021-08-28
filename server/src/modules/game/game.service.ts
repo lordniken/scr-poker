@@ -86,7 +86,7 @@ export class GameService {
   async getGameInfo(gameId: string, user: User): Promise<GameInfo> {
     const game = await this.findGameById(gameId);
     const isGameOwner = user.id === game.ownerId;
-    const userVote = await this.storieService.findVoteByUserId(
+    const userVote = await this.storieService.findUserVote(
       gameId,
       game.status.votingStorieId,
       user.id,
@@ -124,6 +124,8 @@ export class GameService {
         game.status.votingStorieId,
       );
       votes = this.sortVotesByValue(gameVotes);
+    } else {
+      await this.storieService.resetStorieVotes(storieId);
     }
 
     const savedGame = await this.gamesRepository.save({
