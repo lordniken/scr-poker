@@ -36,21 +36,6 @@ export class StorieResolver {
   ): Promise<boolean> {
     await this.storieService.vote(data, userId);
 
-    const votedUserList = await this.storieService.findVotesByGameId(
-      data.gameId,
-      data.storieId,
-    );
-
-    this.pubSub.publish(events.updateUserVotes, {
-      updateUserVotes: {
-        votes: votedUserList.map(({ userId }) => ({
-          userId,
-          value: null,
-        })),
-        gameId: data.gameId,
-      },
-    });
-
     return true;
   }
 
