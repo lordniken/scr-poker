@@ -91,7 +91,7 @@ const GameFieldResults:React.FC<IProps> = ({ votedUsers, isVotingStarted }) => {
                 <Box padding={.5}>
                   <Card selected={false}>{vote.value}</Card>
                 </Box>
-                <Typography>{vote.count} votes</Typography>
+                <Typography>{vote.count}&nbsp;{vote.count === 1 ? 'vote' : 'votes'}</Typography>
               </FlexBox>
             );
           },
