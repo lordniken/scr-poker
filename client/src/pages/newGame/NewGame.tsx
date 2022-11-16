@@ -103,6 +103,7 @@ const NewGame: React.FC = () => {
             <MenuItem value="fibonacci">Fibonacci ( 0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ? )</MenuItem>
             <MenuItem value="almostFibonacci">Almost Fibonacci (0, ½, 1, 2, 3, 5, 8, 13, 20, 40, 100, ?)</MenuItem>
             <MenuItem value="x2">x2 (0, 1, 2, 4, 8, 16, 32, 64, ?)</MenuItem>
+            <MenuItem value="from0to10">From 0 to 10 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, ?)</MenuItem>
           </Select>
         </FormControl>
         <Box paddingTop={2}>
